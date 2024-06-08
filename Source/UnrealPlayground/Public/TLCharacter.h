@@ -8,6 +8,8 @@
 
 class UCameraComponent;
 class USpringArmComponent;
+class UTLInteractionComponent;
+class UAnimMontage;
 
 UCLASS()
 class UNREALPLAYGROUND_API ATLCharacter : public ACharacter
@@ -32,8 +34,11 @@ public:
 // Custom Code
 protected:
 	
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Attack")
 	TSubclassOf<AActor> ProjectileClass;
+
+	UPROPERTY(EditAnywhere, Category  = "Attack")
+	UAnimMontage* AttackAnim;
 
 	UPROPERTY(VisibleAnywhere)
 	USpringArmComponent* SpringArmComp;
@@ -41,9 +46,17 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	UCameraComponent* CameraComp;
 
+	UPROPERTY(VisibleAnywhere)
+	UTLInteractionComponent* InteractionComp;
+
+	FTimerHandle TimerHandle_PrimaryAttack;
+
 	void MoveForward(float Value);
 
 	void MoveRight(float Value);
 
 	void PrimaryAttack();
+	void PrimaryAttack_TimeElapsed();	
+
+	void PrimaryInteract();
 };

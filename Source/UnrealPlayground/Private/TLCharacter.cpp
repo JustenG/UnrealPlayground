@@ -7,6 +7,7 @@
 #include "DrawDebugHelpers.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "TLInteractionComponent.h"
 
 
 // Sets default values
@@ -21,6 +22,8 @@ ATLCharacter::ATLCharacter()
 
 	CameraComp = CreateDefaultSubobject<UCameraComponent>( "CameraComp" );
 	CameraComp->SetupAttachment(SpringArmComp);
+
+	InteractionComp = CreateDefaultSubobject<UTLInteractionComponent>("InteractionComp");
 
 	GetCharacterMovement()->bOrientRotationToMovement = true; // Face character model in direction the character is moving
 
@@ -72,7 +75,9 @@ void ATLCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	PlayerInputComponent->BindAxis("LookUp", this, &ATLCharacter::AddControllerPitchInput);
 
 	PlayerInputComponent->BindAction("PrimaryAttack", IE_Pressed, this, &ATLCharacter::PrimaryAttack);
+	PlayerInputComponent->BindAction("PrimaryInteract", IE_Pressed, this, &ATLCharacter::PrimaryInteract);
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ATLCharacter::Jump);
+	
 }
 
 
@@ -100,6 +105,13 @@ void ATLCharacter::MoveRight(float Value)
 
 void ATLCharacter::PrimaryAttack()
 {
+	PlayAnimMontage(AttackAnim);
+
+	GetWorldTimerManager().SetTimer(TimerHandle_PrimaryAttack, this, &ATLCharacter::PrimaryAttack_TimeElapsed, 0.2f);
+}
+
+void ATLCharacter::PrimaryAttack_TimeElapsed()
+{
 	FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
 
 	FTransform PrimaryAttackSpawnTM = FTransform(GetActorRotation(), HandLocation);
@@ -108,4 +120,9 @@ void ATLCharacter::PrimaryAttack()
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
 	GetWorld()->SpawnActor<AActor>(ProjectileClass, PrimaryAttackSpawnTM, SpawnParams);
+}
+
+void ATLCharacter::PrimaryInteract()
+{
+	InteractionComp->PrimaryInteract();
 }
