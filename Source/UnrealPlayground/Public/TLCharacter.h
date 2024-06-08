@@ -46,5 +46,4 @@ protected:
 	void MoveRight(float Value);
 
 	void PrimaryAttack();
-
 };
