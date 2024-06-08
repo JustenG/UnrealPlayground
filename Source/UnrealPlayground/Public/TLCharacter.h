@@ -29,8 +29,12 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+// Custom Code
 protected:
 	
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AActor> ProjectileClass;
+
 	UPROPERTY(VisibleAnywhere)
 	USpringArmComponent* SpringArmComp;
 
@@ -40,5 +44,7 @@ protected:
 	void MoveForward(float Value);
 
 	void MoveRight(float Value);
+
+	void PrimaryAttack();
 
 };
