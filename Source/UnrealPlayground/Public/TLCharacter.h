@@ -40,13 +40,13 @@ protected:
 	UPROPERTY(EditAnywhere, Category  = "Attack")
 	UAnimMontage* AttackAnim;
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	USpringArmComponent* SpringArmComp;
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UCameraComponent* CameraComp;
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UTLInteractionComponent* InteractionComp;
 
 	FTimerHandle TimerHandle_PrimaryAttack;
