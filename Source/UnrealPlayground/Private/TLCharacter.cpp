@@ -105,22 +105,39 @@ void ATLCharacter::MoveRight(float Value)
 
 void ATLCharacter::PrimaryAttack()
 {
-	PlayAnimMontage(AttackAnim);
-
-	GetWorldTimerManager().SetTimer(TimerHandle_PrimaryAttack, this, &ATLCharacter::PrimaryAttack_TimeElapsed, 0.2f);
+	if (!GetWorldTimerManager().IsTimerActive(TimerHandle_PrimaryAttack))
+	{
+		PlayAnimMontage(AttackAnim);
+		GetWorldTimerManager().SetTimer(TimerHandle_PrimaryAttack, this, &ATLCharacter::PrimaryAttack_TimeElapsed, 0.2f);
+	}
 }
 
 void ATLCharacter::PrimaryAttack_TimeElapsed()
 {
 	FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
 
-	FTransform PrimaryAttackSpawnTM = FTransform(GetActorRotation(), HandLocation);
+	FVector Start = CameraComp->GetComponentLocation();
+	FVector Forward = CameraComp->GetForwardVector();
+	FVector End = Start + (Forward * 10000);
+
+	FHitResult Hit;
+	FCollisionObjectQueryParams ObjectQueryParams;
+	ObjectQueryParams.AddObjectTypesToQuery(ECC_WorldStatic);
+	ObjectQueryParams.AddObjectTypesToQuery(ECC_WorldDynamic);
+	GetWorld()->LineTraceSingleByObjectType(Hit, Start, End, ObjectQueryParams);
+
+	FVector Traget = Hit.IsValidBlockingHit() ? Hit.ImpactPoint : End;
+	FRotator ProjectileRotation = FRotationMatrix::MakeFromX(Traget - HandLocation).Rotator();
+
+	FTransform PrimaryAttackSpawnTM = FTransform(ProjectileRotation, HandLocation);
 
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	SpawnParams.Instigator = this;
 
 	GetWorld()->SpawnActor<AActor>(ProjectileClass, PrimaryAttackSpawnTM, SpawnParams);
+
+	GetWorldTimerManager().ClearTimer(TimerHandle_PrimaryAttack); 
 }
 
 void ATLCharacter::PrimaryInteract()
