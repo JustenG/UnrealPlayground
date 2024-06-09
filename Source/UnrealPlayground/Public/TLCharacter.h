@@ -10,6 +10,7 @@ class UCameraComponent;
 class USpringArmComponent;
 class UTLInteractionComponent;
 class UAnimMontage;
+class UTLAttributeComponent;
 
 UCLASS()
 class UNREALPLAYGROUND_API ATLCharacter : public ACharacter
@@ -40,14 +41,17 @@ protected:
 	UPROPERTY(EditAnywhere, Category  = "Attack")
 	UAnimMontage* AttackAnim;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	USpringArmComponent* SpringArmComp;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UCameraComponent* CameraComp;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UTLInteractionComponent* InteractionComp;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	UTLAttributeComponent* AtributeComp;
 
 	FTimerHandle TimerHandle_PrimaryAttack;
 

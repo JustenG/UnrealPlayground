@@ -6,6 +6,7 @@
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Particles/ParticleSystemComponent.h"
+#include "TLAttributeComponent.h"
 #include <Kismet/GameplayStatics.h>
 
 // Sets default values
@@ -49,6 +50,7 @@ void ATLMagicProjectile::PostInitializeComponents()
 	// You should *never* bind your delegates in the constructor and choose either AActor::PostInitializeComponents() or BeginPlay() 
 	// to avoid issues where delegates get serialized into the Blueprint and will still be called even when you later remove the delegate binding in C++.
 	SphereComp->OnComponentHit.AddDynamic(this, &ATLMagicProjectile::OnActorHit);
+	SphereComp->OnComponentBeginOverlap.AddDynamic(this, &ATLMagicProjectile::OnActorOverlap);
 }
 
 
@@ -66,9 +68,26 @@ void ATLMagicProjectile::OnActorHit(UPrimitiveComponent* HitComponent, AActor* O
 }
 
 
+void ATLMagicProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (OtherActor)
+	{
+		UTLAttributeComponent* AttributeComp = Cast<UTLAttributeComponent>(OtherActor->GetComponentByClass(UTLAttributeComponent::StaticClass()));
+		if (AttributeComp)
+		{
+			AttributeComp->ApplyHealthChange(-20.0f);
+		}
+	}
+
+	HandleImpact();
+}
+
+
 // _Implementation from it being marked as BlueprintNativeEvent
 void ATLMagicProjectile::HandleImpact_Implementation()
 {
 	// Auto-managed particle pooling
 	UGameplayStatics::SpawnEmitterAtLocation(this, ImpactVFX, GetActorLocation(), GetActorRotation(), true, EPSCPoolMethod::AutoRelease);
+
+	Destroy();
 }

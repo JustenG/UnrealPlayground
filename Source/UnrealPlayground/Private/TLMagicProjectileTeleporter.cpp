@@ -30,7 +30,8 @@ void ATLMagicProjectileTeleporter::HandleImpact_Implementation()
 	MovementComp->StopMovementImmediately();
 	SetActorEnableCollision(false);
 
-	ATLMagicProjectile::HandleImpact_Implementation();
+	// Auto-managed particle pooling
+	UGameplayStatics::SpawnEmitterAtLocation(this, ImpactVFX, GetActorLocation(), GetActorRotation(), true, EPSCPoolMethod::AutoRelease);
 }
 
 

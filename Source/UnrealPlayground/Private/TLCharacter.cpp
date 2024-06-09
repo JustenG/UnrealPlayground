@@ -8,6 +8,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "TLInteractionComponent.h"
+#include "TLAttributeComponent.h"
 
 
 // Sets default values
@@ -24,6 +25,8 @@ ATLCharacter::ATLCharacter()
 	CameraComp->SetupAttachment(SpringArmComp);
 
 	InteractionComp = CreateDefaultSubobject<UTLInteractionComponent>("InteractionComp");
+
+	AtributeComp = CreateDefaultSubobject<UTLAttributeComponent>("AtributeComp");
 
 	GetCharacterMovement()->bOrientRotationToMovement = true; // Face character model in direction the character is moving
 
