@@ -7,6 +7,7 @@
 #include "DrawDebugHelpers.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "TLInteractionComponent.h"
 #include "TLAttributeComponent.h"
 
@@ -180,18 +181,25 @@ void ATLCharacter::SpawnAttack(TSubclassOf<AActor>& ProjectileClass)
 
 	GetWorld()->SpawnActor<AActor>(ProjectileClass, PrimaryAttackSpawnTM, SpawnParams);
 
+	UGameplayStatics::SpawnEmitterAttached(AttackVFX, GetMesh(), "Muzzle_01", FVector::ZeroVector, FRotator::ZeroRotator, EAttachLocation::SnapToTarget, true, EPSCPoolMethod::AutoRelease);
+
 	GetWorldTimerManager().ClearTimer(TimerHandle_SpawnAttack);
 }
 
 
 void ATLCharacter::PrimaryInteract()
 {
-	InteractionComp->PrimaryInteract();
+	InteractionComp->InteractNearby();
 }
 
 
 void ATLCharacter::OnHealthChanged(AActor* InstigatorActor, UTLAttributeComponent* OwningComp, float NewHealth, float Delta)
 {
+	if (Delta < 0.0f)
+	{
+		GetMesh()->SetScalarParameterValueOnMaterials("TimeToHit", static_cast<float>(GetWorld()->TimeSeconds));
+	}
+
 	// Died
 	if (NewHealth <= 0.0f && Delta < 0.0f)
 	{

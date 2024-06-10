@@ -55,6 +55,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category  = "Attack")
 	UAnimMontage* AttackAnim;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Attack")
+	UParticleSystem* AttackVFX;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	USpringArmComponent* SpringArmComp;
 

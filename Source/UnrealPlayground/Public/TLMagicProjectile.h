@@ -8,6 +8,7 @@
 
 class USphereComponent;
 class UProjectileMovementComponent;
+class USoundCue;
 
 UCLASS()
 class UNREALPLAYGROUND_API ATLMagicProjectile : public AActor
@@ -17,8 +18,6 @@ class UNREALPLAYGROUND_API ATLMagicProjectile : public AActor
 public:	
 	// Sets default values for this actor's properties
 	ATLMagicProjectile();
-
-
 
 protected:
 	// Called when the game starts or when spawned
@@ -32,6 +31,21 @@ public:
 
 protected:
 
+	UPROPERTY(EditDefaultsOnly, Category = "Effects")
+	float LifetimeMax;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Effects")
+	UParticleSystem* ImpactVFX;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Effects")
+	USoundCue* ImpactSound;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Effects")
+	TSubclassOf<UCameraShakeBase> ImpactShake;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Effects")
+	float ImpactShakeRadius;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component");
 	USphereComponent* SphereComp;
 
@@ -41,11 +55,8 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component");
 	UParticleSystemComponent* EffectComp;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Effects")
-	UParticleSystem* ImpactVFX;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Effects")
-	float LifetimeMax;
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	UAudioComponent* AudioComp;
 
 	UFUNCTION()
 	virtual void OnActorHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);

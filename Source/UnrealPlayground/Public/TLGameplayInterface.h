@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
+#include "TLInteractionType.h"
 #include "TLGameplayInterface.generated.h"
 
 // This class does not need to be modified.
@@ -22,6 +23,9 @@ class UNREALPLAYGROUND_API ITLGameplayInterface
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	ETLInteractionType GetInteractionType();
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	void Interact(APawn* InstigatorPawn);

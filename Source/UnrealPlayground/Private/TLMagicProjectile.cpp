@@ -3,11 +3,13 @@
 
 #include "TLMagicProjectile.h"
 
+#include "Components/AudioComponent.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "Particles/ParticleSystemComponent.h"
+#include "Sound/SoundCue.h"
 #include "TLAttributeComponent.h"
-#include <Kismet/GameplayStatics.h>
 
 // Sets default values
 ATLMagicProjectile::ATLMagicProjectile()
@@ -26,6 +28,11 @@ ATLMagicProjectile::ATLMagicProjectile()
 	MovementComp->InitialSpeed = 5000.0f;
 	MovementComp->bRotationFollowsVelocity = true;
 	MovementComp->bInitialVelocityInLocalSpace = true;
+
+	AudioComp = CreateDefaultSubobject<UAudioComponent>("AudioComp");
+	AudioComp->SetupAttachment(RootComponent);
+
+	ImpactShakeRadius = 1500.0f;
 }
 
 
@@ -88,6 +95,10 @@ void ATLMagicProjectile::HandleMagicProjectileImpact_Implementation()
 {
 	// Auto-managed particle pooling
 	UGameplayStatics::SpawnEmitterAtLocation(this, ImpactVFX, GetActorLocation(), GetActorRotation(), true, EPSCPoolMethod::AutoRelease);
+
+	UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation());
+
+	UGameplayStatics::PlayWorldCameraShake(this, ImpactShake, GetActorLocation(), 0, ImpactShakeRadius);
 
 	Destroy();
 }

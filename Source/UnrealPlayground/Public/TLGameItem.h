@@ -4,20 +4,19 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "TLGameplayInterface.h"
-#include "TLItemChest.generated.h"
+#include "TLGameItem.generated.h"
 
-
+class ETLInteractionType;
 class UStaticMeshComponent;
 
 UCLASS()
-class UNREALPLAYGROUND_API ATLItemChest : public AActor, public ITLGameplayInterface
+class UNREALPLAYGROUND_API ATLGameItem : public AActor
 {
 	GENERATED_BODY()
-
+	
 public:	
 	// Sets default values for this actor's properties
-	ATLItemChest();
+	ATLGameItem();
 
 protected:
 	// Called when the game starts or when spawned
@@ -27,20 +26,22 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+// Custom Code
 private:
 
-	UPROPERTY(EditAnywhere)
-	float TargetPitch;
+	FTimerHandle TimerHandle_RespawnDelay;
 
 	void Interact_Implementation(APawn* InstigatorPawn);
 
 protected:
 
+	UPROPERTY(EditDefaultsOnly, Category = "Game Item")
+	bool bRespawns;
+
+	UPROPERTY(EditDefaultsOnly, meta = (EditCondition = "bRespawns"), Category = "Game Item")
+	float RespawnDelay;
+
 	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<UStaticMeshComponent> BaseMesh;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	TObjectPtr<UStaticMeshComponent> LidMesh;
-
+	TObjectPtr<UStaticMeshComponent> MeshComp;
 
 };

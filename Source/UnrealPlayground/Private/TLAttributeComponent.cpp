@@ -6,7 +6,8 @@
 // Sets default values for this component's properties
 UTLAttributeComponent::UTLAttributeComponent()
 {
-	Health = 100;
+	HealthMax = 100;
+	Health = HealthMax;
 }
 
 
@@ -15,12 +16,35 @@ bool UTLAttributeComponent::IsAlive() const
 	return Health > 0.0f;
 }
 
+
+bool UTLAttributeComponent::IsFullHealth() const
+{
+	return Health >= HealthMax;
+}
+
+
+float UTLAttributeComponent::GetHealth() const
+{
+	return Health;
+}
+
+
+float UTLAttributeComponent::GetHealthMax() const
+{
+	return HealthMax;
+}
+
+
 bool UTLAttributeComponent::ApplyHealthChange(float Delta)
 {
-	Health += Delta;
+	float HealthOld = Health;
+	float HealthNew = FMath::Clamp(Health + Delta, 0.0f, HealthMax);
+	float DeltaClamped = HealthNew - HealthOld;
+	
+	Health = HealthNew;
 
-	OnHealthChanged.Broadcast(nullptr, this, Health, Delta);
+	OnHealthChanged.Broadcast(nullptr, this, Health, DeltaClamped);
 
-	return true;
+	return DeltaClamped > 0;
 }
 

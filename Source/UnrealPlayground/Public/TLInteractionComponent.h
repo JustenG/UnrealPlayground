@@ -4,8 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include <TLInteractionType.h>
 #include "TLInteractionComponent.generated.h"
 
+class USphereComponent;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class UNREALPLAYGROUND_API UTLInteractionComponent : public UActorComponent
@@ -22,10 +24,41 @@ protected:
 
 public:	
 	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	//virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
+// Custom Code
+private:
+
+	FTimerHandle TimerHandle_PollRateDelay;
+
+	TArray<AActor*> InteractableActorsNearby;
+
+	FVector LastPollLocation;
+
+protected:
+
+	UPROPERTY(EditDefaultsOnly, Category = "Interact")
+	float PollRateDelay;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Interact")
+	float MaxInteractDistance;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Interact")
+	float MaxContactDistance;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Interact")
+	TEnumAsByte<ECollisionChannel> CollisionChannel;
 
 public:
 
-	void PrimaryInteract();
+	void FindInteractiveObjects();
+
+	bool TryInteractWithType(AActor* Instigator, AActor* Target, TEnumAsByte<ETLInteractionType> InteractionType);
+
+	bool InteractDirect();
+
+	bool InteractNearby();
+
+	bool InteractContact(AActor* Instigator, AActor* Target);
 
 };

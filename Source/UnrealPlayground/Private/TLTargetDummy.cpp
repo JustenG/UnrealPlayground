@@ -29,6 +29,6 @@ void ATLTargetDummy::OnHealthChanged(AActor* InstigatorActor, UTLAttributeCompon
 	if (Delta < 0.0f)
 	{
 		MeshComp->SetScalarParameterValueOnMaterials("TimeToHit", static_cast<float>(GetWorld()->TimeSeconds));
-		UE_LOG(LogTemp, Log, TEXT("TimeSeconds: %f"), static_cast<float>(GetWorld()->TimeSeconds));
+		//UE_LOG(LogTemp, Log, TEXT("TimeSeconds: %f"), static_cast<float>(GetWorld()->TimeSeconds));
 	}
 }
