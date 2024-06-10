@@ -4,6 +4,8 @@
 #include "TLTargetDummy.h"
 #include "TLAttributeComponent.h"
 
+#include UE_INLINE_GENERATED_CPP_BY_NAME(TLTargetDummy)
+
 // Sets default values
 ATLTargetDummy::ATLTargetDummy()
 {
@@ -26,6 +28,7 @@ void ATLTargetDummy::OnHealthChanged(AActor* InstigatorActor, UTLAttributeCompon
 {
 	if (Delta < 0.0f)
 	{
-		MeshComp->SetScalarParameterValueOnMaterials("TimeToHit", GetWorld()->TimeSeconds);
+		MeshComp->SetScalarParameterValueOnMaterials("TimeToHit", static_cast<float>(GetWorld()->TimeSeconds));
+		UE_LOG(LogTemp, Log, TEXT("TimeSeconds: %f"), static_cast<float>(GetWorld()->TimeSeconds));
 	}
 }
