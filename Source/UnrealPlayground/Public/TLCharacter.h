@@ -33,10 +33,22 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 // Custom Code
+private: 
+
+	FTimerHandle TimerHandle_SpawnAttack;
+
+	TSubclassOf<AActor> LastRequestProjectileClass;
+
 protected:
 	
 	UPROPERTY(EditAnywhere, Category = "Attack")
-	TSubclassOf<AActor> ProjectileClass;
+	TSubclassOf<AActor> ProjectileClassPrimary;
+
+	UPROPERTY(EditAnywhere, Category = "Attack")
+	TSubclassOf<AActor> ProjectileClassSecondary;
+
+	UPROPERTY(EditAnywhere, Category = "Attack")
+	TSubclassOf<AActor> ProjectileClassUltimate;
 
 	UPROPERTY(EditAnywhere, Category  = "Attack")
 	UAnimMontage* AttackAnim;
@@ -53,14 +65,15 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UTLAttributeComponent* AtributeComp;
 
-	FTimerHandle TimerHandle_PrimaryAttack;
-
 	void MoveForward(float Value);
-
 	void MoveRight(float Value);
 
 	void PrimaryAttack();
-	void PrimaryAttack_TimeElapsed();	
+	void SecondaryAttack();
+	void UltimateAttack();
+
+	void SpawnAttack_TimeElapsed();	
+	void SpawnAttack(TSubclassOf<AActor>& ProjectileClass);
 
 	void PrimaryInteract();
 };

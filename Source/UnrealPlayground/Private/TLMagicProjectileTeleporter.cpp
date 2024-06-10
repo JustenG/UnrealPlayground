@@ -18,17 +18,19 @@ void ATLMagicProjectileTeleporter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	GetWorldTimerManager().SetTimer(TimerHandle_Teleport, this, &ATLMagicProjectileTeleporter::HandleImpact, MaxTravelTime);
+	GetWorldTimerManager().SetTimer(TimerHandle_Teleport, this, &ATLMagicProjectileTeleporter::HandleMagicProjectileImpact, MaxTravelTime);
 }
 
 
-void ATLMagicProjectileTeleporter::HandleImpact_Implementation()
+void ATLMagicProjectileTeleporter::HandleMagicProjectileImpact_Implementation()
 {
 	GetWorldTimerManager().ClearTimer(TimerHandle_Teleport);
 	GetWorldTimerManager().SetTimer(TimerHandle_Teleport, this, &ATLMagicProjectileTeleporter::TeleportInstigator, TeleportDelay);
 	
 	MovementComp->StopMovementImmediately();
 	SetActorEnableCollision(false);
+
+	EffectComp->DeactivateSystem();
 
 	// Auto-managed particle pooling
 	UGameplayStatics::SpawnEmitterAtLocation(this, ImpactVFX, GetActorLocation(), GetActorRotation(), true, EPSCPoolMethod::AutoRelease);
@@ -40,7 +42,7 @@ void ATLMagicProjectileTeleporter::TeleportInstigator()
 	AActor* MyInstigator = GetInstigator();
 	check(MyInstigator); // Assert
 
-	// Rather than setting the location of the actor, we can use TeleportTo, which does extra safety checks
+	// Rather than setting the location of the actor, we can use TeleportTo, which does extra safety checks, here we explicilty turn off checks
 	MyInstigator->TeleportTo(GetActorLocation(), MyInstigator->GetActorRotation(), false, true);
 
 	Destroy();

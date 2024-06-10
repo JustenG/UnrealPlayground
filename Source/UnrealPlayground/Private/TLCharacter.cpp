@@ -80,6 +80,8 @@ void ATLCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	PlayerInputComponent->BindAction("PrimaryAttack", IE_Pressed, this, &ATLCharacter::PrimaryAttack);
 	PlayerInputComponent->BindAction("PrimaryInteract", IE_Pressed, this, &ATLCharacter::PrimaryInteract);
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ATLCharacter::Jump);
+	PlayerInputComponent->BindAction("SecondaryAttack", IE_Pressed, this, &ATLCharacter::SecondaryAttack);
+	PlayerInputComponent->BindAction("UltimateAttack", IE_Pressed, this, &ATLCharacter::UltimateAttack);
 	
 }
 
@@ -108,14 +110,44 @@ void ATLCharacter::MoveRight(float Value)
 
 void ATLCharacter::PrimaryAttack()
 {
-	if (!GetWorldTimerManager().IsTimerActive(TimerHandle_PrimaryAttack))
+	if (!GetWorldTimerManager().IsTimerActive(TimerHandle_SpawnAttack))
 	{
 		PlayAnimMontage(AttackAnim);
-		GetWorldTimerManager().SetTimer(TimerHandle_PrimaryAttack, this, &ATLCharacter::PrimaryAttack_TimeElapsed, 0.2f);
+		GetWorldTimerManager().SetTimer(TimerHandle_SpawnAttack, this, &ATLCharacter::SpawnAttack_TimeElapsed, 0.2f);
+		LastRequestProjectileClass = ProjectileClassPrimary;
 	}
 }
 
-void ATLCharacter::PrimaryAttack_TimeElapsed()
+
+void ATLCharacter::SecondaryAttack()
+{
+	if (!GetWorldTimerManager().IsTimerActive(TimerHandle_SpawnAttack))
+	{
+		PlayAnimMontage(AttackAnim);
+		GetWorldTimerManager().SetTimer(TimerHandle_SpawnAttack, this, &ATLCharacter::SpawnAttack_TimeElapsed, 0.2f);
+		LastRequestProjectileClass = ProjectileClassSecondary;
+	}
+}
+
+
+void ATLCharacter::UltimateAttack()
+{
+	if (!GetWorldTimerManager().IsTimerActive(TimerHandle_SpawnAttack))
+	{
+		PlayAnimMontage(AttackAnim);
+		GetWorldTimerManager().SetTimer(TimerHandle_SpawnAttack, this, &ATLCharacter::SpawnAttack_TimeElapsed, 0.2f);
+		LastRequestProjectileClass = ProjectileClassUltimate;
+	}
+}
+
+
+void ATLCharacter::SpawnAttack_TimeElapsed()
+{
+	SpawnAttack(LastRequestProjectileClass);
+}
+
+
+void ATLCharacter::SpawnAttack(TSubclassOf<AActor>& ProjectileClass)
 {
 	FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
 
@@ -127,6 +159,7 @@ void ATLCharacter::PrimaryAttack_TimeElapsed()
 	FCollisionObjectQueryParams ObjectQueryParams;
 	ObjectQueryParams.AddObjectTypesToQuery(ECC_WorldStatic);
 	ObjectQueryParams.AddObjectTypesToQuery(ECC_WorldDynamic);
+	ObjectQueryParams.AddObjectTypesToQuery(ECC_Pawn);
 	GetWorld()->LineTraceSingleByObjectType(Hit, Start, End, ObjectQueryParams);
 
 	FVector Traget = Hit.IsValidBlockingHit() ? Hit.ImpactPoint : End;
@@ -140,8 +173,9 @@ void ATLCharacter::PrimaryAttack_TimeElapsed()
 
 	GetWorld()->SpawnActor<AActor>(ProjectileClass, PrimaryAttackSpawnTM, SpawnParams);
 
-	GetWorldTimerManager().ClearTimer(TimerHandle_PrimaryAttack); 
+	GetWorldTimerManager().ClearTimer(TimerHandle_SpawnAttack);
 }
+
 
 void ATLCharacter::PrimaryInteract()
 {

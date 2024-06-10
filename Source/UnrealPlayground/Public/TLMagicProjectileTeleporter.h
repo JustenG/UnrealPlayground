@@ -33,7 +33,7 @@ protected:
 
 	FTimerHandle TimerHandle_Teleport;
 
-	virtual void HandleImpact_Implementation() override;
+	virtual void HandleMagicProjectileImpact_Implementation() override;
 
 	void TeleportInstigator();
 

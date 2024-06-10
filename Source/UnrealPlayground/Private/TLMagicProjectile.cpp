@@ -64,27 +64,27 @@ void ATLMagicProjectile::Tick(float DeltaTime)
 
 void ATLMagicProjectile::OnActorHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	HandleImpact();
+	if (OtherActor && OtherActor != GetInstigator())
+		HandleMagicProjectileImpact();
 }
 
 
 void ATLMagicProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (OtherActor)
+	if (OtherActor && OtherActor != GetInstigator())
 	{
 		UTLAttributeComponent* AttributeComp = Cast<UTLAttributeComponent>(OtherActor->GetComponentByClass(UTLAttributeComponent::StaticClass()));
 		if (AttributeComp)
 		{
 			AttributeComp->ApplyHealthChange(-20.0f);
 		}
+		HandleMagicProjectileImpact();
 	}
-
-	HandleImpact();
 }
 
 
 // _Implementation from it being marked as BlueprintNativeEvent
-void ATLMagicProjectile::HandleImpact_Implementation()
+void ATLMagicProjectile::HandleMagicProjectileImpact_Implementation()
 {
 	// Auto-managed particle pooling
 	UGameplayStatics::SpawnEmitterAtLocation(this, ImpactVFX, GetActorLocation(), GetActorRotation(), true, EPSCPoolMethod::AutoRelease);
