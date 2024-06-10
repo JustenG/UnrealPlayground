@@ -32,6 +32,8 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	virtual void PostInitializeComponents() override;
+
 // Custom Code
 private: 
 
@@ -63,7 +65,7 @@ protected:
 	UTLInteractionComponent* InteractionComp;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-	UTLAttributeComponent* AtributeComp;
+	UTLAttributeComponent* AttributeComp;
 
 	void MoveForward(float Value);
 	void MoveRight(float Value);
@@ -76,4 +78,7 @@ protected:
 	void SpawnAttack(TSubclassOf<AActor>& ProjectileClass);
 
 	void PrimaryInteract();
+
+	UFUNCTION()
+	void OnHealthChanged(AActor* InstigatorActor, UTLAttributeComponent* OwningComp, float NewHealth, float Delta);
 };

@@ -26,7 +26,7 @@ ATLCharacter::ATLCharacter()
 
 	InteractionComp = CreateDefaultSubobject<UTLInteractionComponent>("InteractionComp");
 
-	AtributeComp = CreateDefaultSubobject<UTLAttributeComponent>("AtributeComp");
+	AttributeComp = CreateDefaultSubobject<UTLAttributeComponent>("AtributeComp");
 
 	GetCharacterMovement()->bOrientRotationToMovement = true; // Face character model in direction the character is moving
 
@@ -83,6 +83,13 @@ void ATLCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	PlayerInputComponent->BindAction("SecondaryAttack", IE_Pressed, this, &ATLCharacter::SecondaryAttack);
 	PlayerInputComponent->BindAction("UltimateAttack", IE_Pressed, this, &ATLCharacter::UltimateAttack);
 	
+}
+
+void ATLCharacter::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	AttributeComp->OnHealthChanged.AddDynamic(this, &ATLCharacter::OnHealthChanged);
 }
 
 
@@ -180,4 +187,17 @@ void ATLCharacter::SpawnAttack(TSubclassOf<AActor>& ProjectileClass)
 void ATLCharacter::PrimaryInteract()
 {
 	InteractionComp->PrimaryInteract();
+}
+
+
+void ATLCharacter::OnHealthChanged(AActor* InstigatorActor, UTLAttributeComponent* OwningComp, float NewHealth, float Delta)
+{
+	// Died
+	if (NewHealth <= 0.0f && Delta < 0.0f)
+	{
+		APlayerController* PC = GetController<APlayerController>();
+		DisableInput(PC);
+
+		SetLifeSpan(5.0f);
+	}
 }

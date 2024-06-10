@@ -10,6 +10,11 @@ UTLAttributeComponent::UTLAttributeComponent()
 }
 
 
+bool UTLAttributeComponent::IsAlive() const
+{
+	return Health > 0.0f;
+}
+
 bool UTLAttributeComponent::ApplyHealthChange(float Delta)
 {
 	Health += Delta;
