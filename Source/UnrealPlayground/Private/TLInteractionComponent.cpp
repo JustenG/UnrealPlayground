@@ -31,6 +31,11 @@ void UTLInteractionComponent::BeginPlay()
 }
 
 
+float UTLInteractionComponent::GetMaxInteractDistance_Implementation()
+{
+	return MaxInteractDistance;
+}
+
 void UTLInteractionComponent::FindInteractiveObjects()
 {
 	AActor* MyOwner = GetOwner();
@@ -60,15 +65,7 @@ void UTLInteractionComponent::FindInteractiveObjects()
 		AActor* HitActor = Hits[i].GetActor();
 		if (HitActor->Implements<UTLGameplayInterface>())
 		{
-			bool bSuccess = InteractContact(MyOwner, HitActor);
-			if (!bSuccess)
-			{
-				ETLInteractionType TargetInteractionType = (ETLInteractionType)ITLGameplayInterface::Execute_GetInteractionType(HitActor);
-				if (TargetInteractionType == ETLInteractionType::EBT_NEARBY)
-				{
-					InteractableActorsNearby.Add(HitActor);
-				}
-			}
+			InteractableActorsNearby.Add(HitActor);
 		}
 	}
 
@@ -105,11 +102,8 @@ bool UTLInteractionComponent::InteractDirect()
 		{
 			if (HitActor->Implements<UTLGameplayInterface>())
 			{
-				bool bSuccess = TryInteractWithType(MyOwner, HitActor, ETLInteractionType::EBT_DIRECT);
-				if (bSuccess)
-				{
-					return true;
-				}
+				ITLGameplayInterface::Execute_Interact(HitActor, Cast<APawn>(MyOwner), ETLInteractionType::EBT_DIRECT);
+				return true;
 			}
 		}
 	}
@@ -140,30 +134,7 @@ bool UTLInteractionComponent::InteractNearby()
 	if (ClosestActor)
 	{
 		APawn* MyPawn = Cast<APawn>(MyOwner);
-		ITLGameplayInterface::Execute_Interact(ClosestActor, MyPawn);
-		return true;
-	}
-	return false;
-}
-
-
-bool UTLInteractionComponent::InteractContact(AActor* Instigator, AActor* Target)
-{
-	bool bTouching = FVector::Distance(Instigator->GetActorLocation(), Target->GetActorLocation()) < MaxContactDistance;
-	if (bTouching)
-	{
-		return TryInteractWithType(Instigator, Target, ETLInteractionType::EBT_CONTACT);
-	}
-	return false;
-}
-
-
-bool UTLInteractionComponent::TryInteractWithType(AActor* Instigator, AActor* Target, TEnumAsByte<ETLInteractionType> InteractionType)
-{
-	ETLInteractionType TargetInteractionType = ITLGameplayInterface::Execute_GetInteractionType(Target);
-	if (TargetInteractionType == InteractionType)
-	{
-		ITLGameplayInterface::Execute_Interact(Target, Cast<APawn>(Instigator));
+		ITLGameplayInterface::Execute_Interact(ClosestActor, MyPawn, ETLInteractionType::EBT_NEARBY);
 		return true;
 	}
 	return false;

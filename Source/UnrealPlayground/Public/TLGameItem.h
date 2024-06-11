@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "TLGameplayInterface.h"
 #include "TLGameItem.generated.h"
 
-class ETLInteractionType;
 class UStaticMeshComponent;
 
 UCLASS()
-class UNREALPLAYGROUND_API ATLGameItem : public AActor
+class UNREALPLAYGROUND_API ATLGameItem : public AActor, public ITLGameplayInterface
 {
 	GENERATED_BODY()
 	
@@ -19,21 +19,17 @@ public:
 	ATLGameItem();
 
 protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	//virtual void PostInitializeComponents() override;
 
 // Custom Code
 private:
 
 	FTimerHandle TimerHandle_RespawnDelay;
 
-	void Interact_Implementation(APawn* InstigatorPawn);
-
 protected:
+
+	bool bIsActive;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Game Item")
 	bool bRespawns;
@@ -41,7 +37,20 @@ protected:
 	UPROPERTY(EditDefaultsOnly, meta = (EditCondition = "bRespawns"), Category = "Game Item")
 	float RespawnDelay;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Game Item")
+	TEnumAsByte<ETLInteractionType> InteractionType;
+
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UStaticMeshComponent> MeshComp;
 
+	//UFUNCTION()
+	//void OnActorOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	void UseGameItem();
+
+	void RespawnGameItem();
+
+public:
+
+	virtual void Interact_Implementation(APawn* InstigatorPawn, ETLInteractionType InteractionTypeUsed) override;
 };

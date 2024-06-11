@@ -25,9 +25,6 @@ class UNREALPLAYGROUND_API ITLGameplayInterface
 public:
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-	ETLInteractionType GetInteractionType();
-
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-	void Interact(APawn* InstigatorPawn);
+	void Interact(APawn* InstigatorPawn, ETLInteractionType InteractionType);
 
 };

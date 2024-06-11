@@ -4,12 +4,14 @@
 #include "TLCharacter.h"
 
 #include "Camera/CameraComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "DrawDebugHelpers.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "TLInteractionComponent.h"
 #include "TLAttributeComponent.h"
+#include <TLGameplayInterface.h>
 
 
 // Sets default values
@@ -91,6 +93,7 @@ void ATLCharacter::PostInitializeComponents()
 	Super::PostInitializeComponents();
 
 	AttributeComp->OnHealthChanged.AddDynamic(this, &ATLCharacter::OnHealthChanged);
+	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &ATLCharacter::OnActorOverlap);
 }
 
 
@@ -189,6 +192,29 @@ void ATLCharacter::SpawnAttack(TSubclassOf<AActor>& ProjectileClass)
 
 void ATLCharacter::PrimaryInteract()
 {
+	// Direct Camera Interaction 
+	FVector Start = CameraComp->GetComponentLocation();
+	FVector Forward = CameraComp->GetForwardVector();
+	FVector End = Start + (Forward * 10000);
+
+	FHitResult Hit;
+	FCollisionObjectQueryParams ObjectQueryParams;
+	ObjectQueryParams.AddObjectTypesToQuery(ECC_WorldStatic);
+	ObjectQueryParams.AddObjectTypesToQuery(ECC_WorldDynamic);
+	ObjectQueryParams.AddObjectTypesToQuery(ECC_Pawn);
+	GetWorld()->LineTraceSingleByObjectType(Hit, Start, End, ObjectQueryParams);
+
+	AActor* HitActor = Hit.GetActor();
+	if (HitActor && HitActor->Implements<UTLGameplayInterface>())
+	{
+		if (FVector::Distance(GetActorLocation(), Hit.ImpactPoint) < InteractionComp->GetMaxInteractDistance())
+		{
+			ITLGameplayInterface::Execute_Interact(HitActor, this, ETLInteractionType::EBT_DIRECT);
+			return;
+		}
+	}
+
+	// Fallback to Nearby interaction
 	InteractionComp->InteractNearby();
 }
 
@@ -207,5 +233,13 @@ void ATLCharacter::OnHealthChanged(AActor* InstigatorActor, UTLAttributeComponen
 		DisableInput(PC);
 
 		SetLifeSpan(5.0f);
+	}
+}
+
+void ATLCharacter::OnActorOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (OtherActor->Implements<UTLGameplayInterface>())
+	{
+		ITLGameplayInterface::Execute_Interact(OtherActor, this, ETLInteractionType::EBT_CONTACT);
 	}
 }

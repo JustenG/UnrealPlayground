@@ -3,29 +3,39 @@
 
 #include "TLGameItem.h"
 
+#include "TLInteractionComponent.h"
+
 // Sets default values
 ATLGameItem::ATLGameItem()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	bIsActive = true;
+	bRespawns = true;
+	RespawnDelay = 10.0f;
+	InteractionType = ETLInteractionType::EBT_CONTACT;
 
+	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>("MeshComp");
+	RootComponent = MeshComp;
 }
 
-// Called when the game starts or when spawned
-void ATLGameItem::BeginPlay()
+void ATLGameItem::Interact_Implementation(APawn* InstigatorPawn, ETLInteractionType InteractionTypeUsed)
 {
-	Super::BeginPlay();
-	
+	// Implement in derived classes
 }
 
-// Called every frame
-void ATLGameItem::Tick(float DeltaTime)
+void ATLGameItem::UseGameItem()
 {
-	Super::Tick(DeltaTime);
+	bIsActive = false;
 
+	MeshComp->SetVisibility(false, true);
+
+	GetWorldTimerManager().ClearTimer(TimerHandle_RespawnDelay);
+	GetWorldTimerManager().SetTimer(TimerHandle_RespawnDelay, this, &ATLGameItem::RespawnGameItem, RespawnDelay);
 }
 
-void ATLGameItem::Interact_Implementation(APawn* InstigatorPawn)
+void ATLGameItem::RespawnGameItem()
 {
+	bIsActive = true;
+
+	MeshComp->SetVisibility(true, true);
 }
 

@@ -11,59 +11,34 @@
 
 
 // Sets default values
-ATLHealthPotion::ATLHealthPotion()
+ATLHealthPotion::ATLHealthPotion() : ATLGameItem()
 {
-    RespawnDelay = 10.0f;
 
-    MeshComp = CreateDefaultSubobject<UStaticMeshComponent>("MeshComp");
-    RootComponent = MeshComp;
-}
-
-void ATLHealthPotion::PostInitializeComponents()
-{
-    MeshComp->OnComponentBeginOverlap.AddDynamic(this, &ATLHealthPotion::OnActorOverlap);
 }
 
 
-ETLInteractionType ATLHealthPotion::GetInteractionType_Implementation()
+void ATLHealthPotion::Interact_Implementation(APawn* InstigatorPawn, ETLInteractionType InteractionTypeUsed)
 {
-    return ETLInteractionType::EBT_CONTACT;
-}
-
-
-void ATLHealthPotion::Interact_Implementation(APawn* InstigatorPawn)
-{
-    if (GetWorldTimerManager().IsTimerActive(TimerHandle_RespawnDelay))
+    if (!bIsActive)
     {
+        //InteractionSuccessful = false;
         return;
     }
 
-    UTLAttributeComponent* AttributeComp = InstigatorPawn->GetComponentByClass<UTLAttributeComponent>();
-
-    if (!AttributeComp->IsFullHealth())
+    if (InteractionTypeUsed == ETLInteractionType::EBT_CONTACT)
     {
-        AttributeComp->ApplyHealthChange(AttributeComp->GetHealthMax());
-        UE_LOG(LogTemp, Log, TEXT("Player Healed"));
+        UTLAttributeComponent* AttributeComp = InstigatorPawn->GetComponentByClass<UTLAttributeComponent>();
 
-        GetWorldTimerManager().ClearTimer(TimerHandle_RespawnDelay);
-        GetWorldTimerManager().SetTimer(TimerHandle_RespawnDelay, this, &ATLHealthPotion::TogglePotion, RespawnDelay);
-        TogglePotion();
+        if (!AttributeComp->IsFullHealth())
+        {
+            AttributeComp->ApplyHealthChange(AttributeComp->GetHealthMax());
+            UE_LOG(LogTemp, Log, TEXT("Player Healed"));
+
+            UseGameItem();
+            //InteractionSuccessful = true;
+            return;
+        }
     }
-}
-
-
-void ATLHealthPotion::TogglePotion()
-{
-    RootComponent->SetVisibility(!RootComponent->IsVisible(), true);
-}
-
-
-void ATLHealthPotion::OnActorOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-    UTLInteractionComponent* InteractionComp = Cast<UTLInteractionComponent>(OtherActor->GetComponentByClass(UTLInteractionComponent::StaticClass()));
-    if (InteractionComp)
-    {
-        InteractionComp->TryInteractWithType(OtherActor, this, ETLInteractionType::EBT_CONTACT);
-    }
+    //InteractionSuccessful = false;
 }
 

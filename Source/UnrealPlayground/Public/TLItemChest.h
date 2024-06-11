@@ -32,8 +32,6 @@ private:
 	UPROPERTY(EditAnywhere)
 	float TargetPitch;
 
-	void Interact_Implementation(APawn* InstigatorPawn);
-
 protected:
 
 	UPROPERTY(VisibleAnywhere)
@@ -42,5 +40,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UStaticMeshComponent> LidMesh;
 
+public:
 
+	virtual void Interact_Implementation(APawn* InstigatorPawn, ETLInteractionType InteractionTypeUsed) override;
 };

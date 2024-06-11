@@ -35,7 +35,13 @@ void ATLItemChest::Tick(float DeltaTime)
 }
 
 
-void ATLItemChest::Interact_Implementation(APawn* InstigatorPawn)
+void ATLItemChest::Interact_Implementation(APawn* InstigatorPawn, ETLInteractionType InteractionTypeUsed)
 {
-	LidMesh->SetRelativeRotation(FRotator(TargetPitch, 0, 0));
+	if (InteractionTypeUsed == ETLInteractionType::EBT_NEARBY)
+	{
+		LidMesh->SetRelativeRotation(FRotator(TargetPitch, 0, 0));
+		//InteractionSuccessful = true;
+		return;
+	}
+	//InteractionSuccessful = false;
 }

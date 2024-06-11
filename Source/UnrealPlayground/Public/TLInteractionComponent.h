@@ -51,14 +51,12 @@ protected:
 
 public:
 
-	void FindInteractiveObjects();
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	float GetMaxInteractDistance();
 
-	bool TryInteractWithType(AActor* Instigator, AActor* Target, TEnumAsByte<ETLInteractionType> InteractionType);
+	void FindInteractiveObjects();
 
 	bool InteractDirect();
 
 	bool InteractNearby();
-
-	bool InteractContact(AActor* Instigator, AActor* Target);
-
 };

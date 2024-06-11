@@ -42,7 +42,7 @@ void ATLMagicProjectileTeleporter::TeleportInstigator()
 	AActor* MyInstigator = GetInstigator();
 	check(MyInstigator); // Assert
 
-	// Rather than setting the location of the actor, we can use TeleportTo, which does extra safety checks, here we explicilty turn off checks
+	// Rather than setting the location of the actor, we can use TeleportTo, which does extra safety checks, here we explicitly turn off checks
 	MyInstigator->TeleportTo(GetActorLocation(), MyInstigator->GetActorRotation(), false, true);
 
 	Destroy();
