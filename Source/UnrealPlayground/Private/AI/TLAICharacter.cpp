@@ -14,6 +14,7 @@ ATLAICharacter::ATLAICharacter()
 	PawnSensingComp = CreateDefaultSubobject<UPawnSensingComponent>("PawnSensingComp");
 
 	TargetActorKey = "TargetActor";
+	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 }
 
 void ATLAICharacter::PostInitializeComponents()
