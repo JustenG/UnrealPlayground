@@ -33,6 +33,8 @@ ATLMagicProjectile::ATLMagicProjectile()
 	AudioComp->SetupAttachment(RootComponent);
 
 	ImpactShakeRadius = 1500.0f;
+	DamageAmount = 20.0f;
+
 }
 
 
@@ -83,7 +85,7 @@ void ATLMagicProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComponent
 		UTLAttributeComponent* AttributeComp = Cast<UTLAttributeComponent>(OtherActor->GetComponentByClass(UTLAttributeComponent::StaticClass()));
 		if (AttributeComp)
 		{
-			AttributeComp->ApplyHealthChange(-20.0f);
+			AttributeComp->ApplyHealthChange(-DamageAmount);
 		}
 		HandleMagicProjectileImpact();
 	}

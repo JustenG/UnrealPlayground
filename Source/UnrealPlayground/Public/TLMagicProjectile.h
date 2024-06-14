@@ -29,6 +29,11 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+private:
+
+	UPROPERTY(EditDefaultsOnly, Category = "Damage")
+	float DamageAmount;
+
 protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Effects")
