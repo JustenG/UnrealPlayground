@@ -6,6 +6,10 @@
 #include "GameFramework/Character.h"
 #include "TLAICharacter.generated.h"
 
+
+class UPawnSensingComponent;
+
+
 UCLASS()
 class UNREALPLAYGROUND_API ATLAICharacter : public ACharacter
 {
@@ -16,14 +20,24 @@ public:
 	ATLAICharacter();
 
 protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+
+	virtual void PostInitializeComponents() override;
 
 public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+// Custom Code
+protected:
+
+	UPROPERTY(VisibleAnywhere, Category = "Effects")
+	FName TargetActorKey;
+
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	UPawnSensingComponent* PawnSensingComp;
+
+	UFUNCTION()
+	void OnPawnSeen(APawn* Pawn);
 
 };
