@@ -44,4 +44,6 @@ protected:
 	UFUNCTION()
 	void OnPawnSeen(APawn* Pawn);
 
+	UFUNCTION()
+	void OnHealthChanged(AActor* InstigatorActor, UTLAttributeComponent* OwningComp, float NewHealth, float Delta);
 };
