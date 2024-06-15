@@ -9,6 +9,7 @@
 
 
 class UEnvQuery;
+class UCurveFloat;
 
 /**
  * 
@@ -31,6 +32,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "AI")
 	float SpawnTimerInterval;
+
+	UPROPERTY(EditDefaultsOnly, Category = "AI")
+	UCurveFloat* DifficultyCurve;
 
 	UPROPERTY(EditDefaultsOnly, Category = "AI")
 	TSubclassOf<AActor> MinionClass;

@@ -48,3 +48,14 @@ bool UTLAttributeComponent::ApplyHealthChange(float Delta)
 	return DeltaClamped > 0;
 }
 
+
+UTLAttributeComponent* UTLAttributeComponent::GetAttributes(AActor* FromActor)
+{
+	if (FromActor)
+	{
+		return FromActor->FindComponentByClass<UTLAttributeComponent>();
+	}
+
+	return nullptr;
+}
+

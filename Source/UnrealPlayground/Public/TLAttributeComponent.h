@@ -46,4 +46,10 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Attributes")
 	bool ApplyHealthChange(float Delta);
+
+// Statics
+public:
+
+	UFUNCTION(BlueprintCallable, Category = "Attributes")
+	static UTLAttributeComponent* GetAttributes(AActor* FromActor);
 };

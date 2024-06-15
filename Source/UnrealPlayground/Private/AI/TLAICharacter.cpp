@@ -6,12 +6,14 @@
 #include "AIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "DrawDebugHelpers.h"
+#include "TLAttributeComponent.h"
 
 
 // Sets default values
 ATLAICharacter::ATLAICharacter()
 {
 	PawnSensingComp = CreateDefaultSubobject<UPawnSensingComponent>("PawnSensingComp");
+	AttributeComp = CreateDefaultSubobject<UTLAttributeComponent>("AttributeComp");
 
 	TargetActorKey = "TargetActor";
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
