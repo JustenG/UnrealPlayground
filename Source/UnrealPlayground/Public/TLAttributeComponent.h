@@ -55,4 +55,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Attributes")
 	static UTLAttributeComponent* GetAttributes(AActor* FromActor);
+
+	UFUNCTION(BlueprintCallable, Category = "Attributes", meta = (DisplayName = "IsAlive"))
+	static bool IsActorAlive(AActor* Actor);
 };

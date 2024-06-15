@@ -65,3 +65,15 @@ UTLAttributeComponent* UTLAttributeComponent::GetAttributes(AActor* FromActor)
 	return nullptr;
 }
 
+
+bool UTLAttributeComponent::IsActorAlive(AActor* Actor)
+{
+	UTLAttributeComponent* AttributeComp = GetAttributes(Actor);
+	if (AttributeComp)
+	{
+		return AttributeComp->IsAlive();
+	}
+
+	return false;
+}
+
