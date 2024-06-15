@@ -86,8 +86,8 @@ void ATLMagicProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComponent
 		if (AttributeComp)
 		{
 			AttributeComp->ApplyHealthChange(GetInstigator(), - DamageAmount);
+			HandleMagicProjectileImpact();
 		}
-		HandleMagicProjectileImpact();
 	}
 }
 
