@@ -35,6 +35,12 @@ float UTLAttributeComponent::GetHealthMax() const
 }
 
 
+float UTLAttributeComponent::GetHealthPercentage() const
+{
+	return Health / HealthMax;
+}
+
+
 bool UTLAttributeComponent::ApplyHealthChange(float Delta)
 {
 	float HealthOld = Health;

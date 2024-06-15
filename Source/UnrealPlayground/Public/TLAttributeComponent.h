@@ -45,6 +45,9 @@ public:
 	float GetHealthMax() const;
 
 	UFUNCTION(BlueprintCallable, Category = "Attributes")
+	float GetHealthPercentage() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Attributes")
 	bool ApplyHealthChange(float Delta);
 
 // Statics
