@@ -6,6 +6,16 @@
 #include "AIController.h"
 #include "GameFramework/Character.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "TLAttributeComponent.h"
+
+
+UTLBTTask_RangedAttack::UTLBTTask_RangedAttack()
+{
+	MuzzleSocket = "Muzzle_01";
+	MaxBulletSpread = 2.0f;
+
+	TargetActorKey.SelectedKeyName = "TargetActor";
+}
 
 
 EBTNodeResult::Type UTLBTTask_RangedAttack::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
@@ -18,9 +28,18 @@ EBTNodeResult::Type UTLBTTask_RangedAttack::ExecuteTask(UBehaviorTreeComponent& 
 		return EBTNodeResult::Failed;
 	}
 
+	if (!UTLAttributeComponent::IsActorAlive(TargetActor))
+	{
+		return EBTNodeResult::Failed;
+	}
+
 	const FVector MuzzleLocation = MyCharacter->GetMesh()->GetSocketLocation(MuzzleSocket);
 	const FVector Direction = TargetActor->GetActorLocation() - MuzzleLocation;
 	FRotator MuzzleRotation = Direction.Rotation();
+
+	// Make Attack less accurate
+	MuzzleRotation.Pitch += FMath::RandRange(0.0f, MaxBulletSpread);
+	MuzzleRotation.Yaw += FMath::RandRange(-MaxBulletSpread, MaxBulletSpread);
 
 	FActorSpawnParameters Params;
 	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;

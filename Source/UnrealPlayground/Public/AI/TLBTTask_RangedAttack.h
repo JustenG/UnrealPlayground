@@ -13,7 +13,13 @@ UCLASS()
 class UNREALPLAYGROUND_API UTLBTTask_RangedAttack : public UBTTaskNode
 {
 	GENERATED_BODY()
-	
+
+public:
+
+	UTLBTTask_RangedAttack();
+
+private:
+
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 
 protected:
