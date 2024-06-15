@@ -33,6 +33,9 @@ public:
 protected:
 
 	UPROPERTY(VisibleAnywhere, Category = "Effects")
+	FName TimeToHitParamName;
+
+	UPROPERTY(VisibleAnywhere, Category = "Effects")
 	FName TargetActorKey;
 
 	UPROPERTY(VisibleAnywhere, Category = "Components")

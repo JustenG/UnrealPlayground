@@ -34,6 +34,8 @@ ATLCharacter::ATLCharacter()
 	GetCharacterMovement()->bOrientRotationToMovement = true; // Face character model in direction the character is moving
 
 	bUseControllerRotationYaw = false; // Don't rotate the character based on Mouse X
+	TimeToHitParamName = "TimeToHit";
+	AttackSpawnBoneParamName = "Muzzle_01";
 }
 
 
@@ -160,7 +162,7 @@ void ATLCharacter::SpawnAttack_TimeElapsed()
 
 void ATLCharacter::SpawnAttack(TSubclassOf<AActor>& ProjectileClass)
 {
-	FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
+	FVector HandLocation = GetMesh()->GetSocketLocation(AttackSpawnBoneParamName);
 
 	FVector Start = CameraComp->GetComponentLocation();
 	FVector Forward = CameraComp->GetForwardVector();
@@ -184,7 +186,7 @@ void ATLCharacter::SpawnAttack(TSubclassOf<AActor>& ProjectileClass)
 
 	GetWorld()->SpawnActor<AActor>(ProjectileClass, PrimaryAttackSpawnTM, SpawnParams);
 
-	UGameplayStatics::SpawnEmitterAttached(AttackVFX, GetMesh(), "Muzzle_01", FVector::ZeroVector, FRotator::ZeroRotator, EAttachLocation::SnapToTarget, true, EPSCPoolMethod::AutoRelease);
+	UGameplayStatics::SpawnEmitterAttached(AttackVFX, GetMesh(), AttackSpawnBoneParamName, FVector::ZeroVector, FRotator::ZeroRotator, EAttachLocation::SnapToTarget, true, EPSCPoolMethod::AutoRelease);
 
 	GetWorldTimerManager().ClearTimer(TimerHandle_SpawnAttack);
 }
@@ -223,7 +225,7 @@ void ATLCharacter::OnHealthChanged(AActor* InstigatorActor, UTLAttributeComponen
 {
 	if (Delta < 0.0f)
 	{
-		GetMesh()->SetScalarParameterValueOnMaterials("TimeToHit", static_cast<float>(GetWorld()->TimeSeconds));
+		GetMesh()->SetScalarParameterValueOnMaterials(TimeToHitParamName, static_cast<float>(GetWorld()->TimeSeconds));
 	}
 
 	// Died

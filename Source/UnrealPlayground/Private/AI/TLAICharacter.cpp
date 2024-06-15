@@ -20,6 +20,8 @@ ATLAICharacter::ATLAICharacter()
 
 	TargetActorKey = "TargetActor";
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
+
+	TimeToHitParamName = "TimeToHit";
 }
 
 void ATLAICharacter::PostInitializeComponents()
@@ -73,6 +75,8 @@ void ATLAICharacter::OnHealthChanged(AActor* InstigatorActor, UTLAttributeCompon
 		{
 			SetTargetActor(InstigatorActor);
 		}
+
+		GetMesh()->SetScalarParameterValueOnMaterials(TimeToHitParamName, static_cast<float>(GetWorld()->TimeSeconds));
 
 		// Actor has Died
 		if (NewHealth <= 0.0f)
