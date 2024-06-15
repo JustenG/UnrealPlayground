@@ -31,7 +31,7 @@ void ATLHealthPotion::Interact_Implementation(APawn* InstigatorPawn, ETLInteract
 
         if (!AttributeComp->IsFullHealth())
         {
-            AttributeComp->ApplyHealthChange(AttributeComp->GetHealthMax());
+            AttributeComp->ApplyHealthChange(this, AttributeComp->GetHealthMax());
             UE_LOG(LogTemp, Log, TEXT("Player Healed"));
 
             UseGameItem();

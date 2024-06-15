@@ -4,6 +4,7 @@
 #include "AI/TLBTTask_HealActor.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "TLAttributeComponent.h"
+#include "AIController.h"
 
 EBTNodeResult::Type UTLBTTask_HealActor::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
@@ -12,7 +13,8 @@ EBTNodeResult::Type UTLBTTask_HealActor::ExecuteTask(UBehaviorTreeComponent& Own
 	UTLAttributeComponent* AttributeComp = UTLAttributeComponent::GetAttributes(TargetActor);
 	if (ensure(AttributeComp))
 	{
-		AttributeComp->ApplyHealthChange(AttributeComp->GetHealthMax());
+		AAIController* MyController = OwnerComp.GetAIOwner();
+		AttributeComp->ApplyHealthChange(MyController->GetPawn(), AttributeComp->GetHealthMax());
 	}
 
 	return EBTNodeResult::Succeeded;

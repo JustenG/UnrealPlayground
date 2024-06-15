@@ -39,6 +39,20 @@ void ATLAICharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 }
 
 
+void ATLAICharacter::SetTargetActor(AActor* NewTarget)
+{
+	AAIController* AIC = GetController<AAIController>();
+	AIC->GetBlackboardComponent()->SetValueAsObject(TargetActorKey, NewTarget);
+}
+
+
+AActor* ATLAICharacter::GetTargetActor() const
+{
+	AAIController* AIC = GetController<AAIController>();
+	return Cast<AActor>(AIC->GetBlackboardComponent()->GetValueAsObject(TargetActorKey));
+}
+
+
 void ATLAICharacter::OnPawnSeen(APawn* Pawn)
 {
 	AAIController* AIC = GetController<AAIController>();
@@ -55,6 +69,11 @@ void ATLAICharacter::OnHealthChanged(AActor* InstigatorActor, UTLAttributeCompon
 {
 	if (Delta < 0.0f)
 	{
+		if (InstigatorActor != this)
+		{
+			SetTargetActor(InstigatorActor);
+		}
+
 		// Actor has Died
 		if (NewHealth <= 0.0f)
 		{

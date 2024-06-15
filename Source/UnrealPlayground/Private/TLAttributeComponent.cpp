@@ -41,7 +41,7 @@ float UTLAttributeComponent::GetHealthPercentage() const
 }
 
 
-bool UTLAttributeComponent::ApplyHealthChange(float Delta)
+bool UTLAttributeComponent::ApplyHealthChange(AActor* InstigatorActor, float Delta)
 {
 	float HealthOld = Health;
 	float HealthNew = FMath::Clamp(Health + Delta, 0.0f, HealthMax);
@@ -49,7 +49,7 @@ bool UTLAttributeComponent::ApplyHealthChange(float Delta)
 	
 	Health = HealthNew;
 
-	OnHealthChanged.Broadcast(nullptr, this, Health, DeltaClamped);
+	OnHealthChanged.Broadcast(InstigatorActor, this, Health, DeltaClamped);
 
 	return DeltaClamped > 0;
 }

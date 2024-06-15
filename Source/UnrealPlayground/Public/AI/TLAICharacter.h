@@ -41,6 +41,12 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UTLAttributeComponent* AttributeComp;
 
+	UFUNCTION(BlueprintCallable, Category = "AI")
+	void SetTargetActor(AActor* NewTarget);
+
+	UFUNCTION(BlueprintCallable, Category = "AI")
+	AActor* GetTargetActor() const;
+
 	UFUNCTION()
 	void OnPawnSeen(APawn* Pawn);
 

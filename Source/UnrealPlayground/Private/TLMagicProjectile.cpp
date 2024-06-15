@@ -85,7 +85,7 @@ void ATLMagicProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComponent
 		UTLAttributeComponent* AttributeComp = Cast<UTLAttributeComponent>(OtherActor->GetComponentByClass(UTLAttributeComponent::StaticClass()));
 		if (AttributeComp)
 		{
-			AttributeComp->ApplyHealthChange(-DamageAmount);
+			AttributeComp->ApplyHealthChange(GetInstigator(), - DamageAmount);
 		}
 		HandleMagicProjectileImpact();
 	}

@@ -48,7 +48,7 @@ public:
 	float GetHealthPercentage() const;
 
 	UFUNCTION(BlueprintCallable, Category = "Attributes")
-	bool ApplyHealthChange(float Delta);
+	bool ApplyHealthChange(AActor* InstigatorActor, float Delta);
 
 // Statics
 public:
