@@ -9,6 +9,8 @@
 
 class UPawnSensingComponent;
 class UTLAttributeComponent;
+class UTLWorldUserWidget;
+class UUserWidget;
 
 
 UCLASS()
@@ -31,6 +33,12 @@ public:
 
 // Custom Code
 protected:
+
+	UPROPERTY()
+	UTLWorldUserWidget* ActiveHealthBar;
+
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
+	TSubclassOf<UUserWidget> HealthBarWidgetClass;
 
 	UPROPERTY(VisibleAnywhere, Category = "Effects")
 	FName TimeToHitParamName;

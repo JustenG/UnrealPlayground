@@ -10,6 +10,7 @@
 #include "BrainComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "TLWorldUserWidget.h"
 
 
 // Sets default values
@@ -23,6 +24,7 @@ ATLAICharacter::ATLAICharacter()
 
 	TimeToHitParamName = "TimeToHit";
 }
+
 
 void ATLAICharacter::PostInitializeComponents()
 {
@@ -76,11 +78,26 @@ void ATLAICharacter::OnHealthChanged(AActor* InstigatorActor, UTLAttributeCompon
 			SetTargetActor(InstigatorActor);
 		}
 
+		if (ActiveHealthBar == nullptr && NewHealth > 0.0)
+		{
+			ActiveHealthBar = CreateWidget<UTLWorldUserWidget>(GetWorld(), HealthBarWidgetClass);
+			if (ActiveHealthBar)
+			{
+				ActiveHealthBar->AttachedActor = this;
+				ActiveHealthBar->AddToViewport();
+			}
+		}
+
 		GetMesh()->SetScalarParameterValueOnMaterials(TimeToHitParamName, static_cast<float>(GetWorld()->TimeSeconds));
 
 		// Actor has Died
 		if (NewHealth <= 0.0f)
 		{
+			if (ActiveHealthBar != nullptr)
+			{
+				ActiveHealthBar->RemoveFromParent();
+			}
+
 			AAIController* AIC = GetController<AAIController>();
 			AIC->GetBrainComponent()->StopLogic("Killed");
 
