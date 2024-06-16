@@ -11,6 +11,8 @@ class USpringArmComponent;
 class UTLInteractionComponent;
 class UAnimMontage;
 class UTLAttributeComponent;
+class UTLActionComponent;
+
 
 UCLASS()
 class UNREALPLAYGROUND_API ATLCharacter : public ACharacter
@@ -24,6 +26,8 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	virtual FVector GetPawnViewLocation() const override;
 
 public:	
 	// Called every frame
@@ -76,8 +80,14 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UTLAttributeComponent* AttributeComp;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	UTLActionComponent* ActionComp;
+
 	void MoveForward(float Value);
 	void MoveRight(float Value);
+
+	void SprintStart();
+	void SprintStop();
 
 	void PrimaryAttack();
 	void SecondaryAttack();

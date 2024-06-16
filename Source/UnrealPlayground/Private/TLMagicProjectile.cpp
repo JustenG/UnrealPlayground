@@ -11,6 +11,8 @@
 #include "Sound/SoundCue.h"
 #include "TLAttributeComponent.h"
 #include "TLGameplayFunctionLibrary.h"
+#include "TLActionComponent.h"
+#include "TLActionEffect.h"
 
 
 // Sets default values
@@ -84,9 +86,23 @@ void ATLMagicProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComponent
 {
 	if (OtherActor && OtherActor != GetInstigator())
 	{
+		UTLActionComponent* ActionComp = Cast<UTLActionComponent>(OtherActor->GetComponentByClass(UTLActionComponent::StaticClass()));
+		if (ActionComp && ActionComp->ActiveGameplayTags.HasTag(ParryTag))
+		{
+			MovementComp->Velocity = -MovementComp->Velocity;
+
+			SetInstigator(Cast<APawn>(OtherActor));
+			return;
+		}
+
 		if (UTLGameplayFunctionLibrary::ApplyDirectionalDamage(GetInstigator(), OtherActor, DamageAmount, SweepResult))
 		{
 			HandleMagicProjectileImpact();
+
+			if (ActionComp)
+			{
+				ActionComp->AddAction(GetInstigator(), BurningActionClass);
+			}
 		}
 	}
 }

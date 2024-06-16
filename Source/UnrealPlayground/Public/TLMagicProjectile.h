@@ -4,11 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "GameplayTagContainer.h"
 #include "TLMagicProjectile.generated.h"
 
 class USphereComponent;
 class UProjectileMovementComponent;
 class USoundCue;
+class UTLActionEffect;
 
 UCLASS()
 class UNREALPLAYGROUND_API ATLMagicProjectile : public AActor
@@ -29,10 +31,16 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-private:
+protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Damage")
 	float DamageAmount;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Damage")
+	FGameplayTag ParryTag;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Damage")
+	TSubclassOf<UTLActionEffect> BurningActionClass;
 
 protected:
 

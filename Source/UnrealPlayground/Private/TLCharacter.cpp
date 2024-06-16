@@ -11,7 +11,8 @@
 #include "Kismet/GameplayStatics.h"
 #include "TLInteractionComponent.h"
 #include "TLAttributeComponent.h"
-#include <TLGameplayInterface.h>
+#include "TLGameplayInterface.h"
+#include "TLActionComponent.h"
 
 
 static TAutoConsoleVariable<bool> CVarDebugDrawPlayerDir(TEXT("tl.DebugDraw.PlayerDir"), false, TEXT("Enable Debug Arrows for Player Direction."), ECVF_Cheat);
@@ -34,6 +35,8 @@ ATLCharacter::ATLCharacter()
 
 	AttributeComp = CreateDefaultSubobject<UTLAttributeComponent>("AtributeComp");
 
+	ActionComp = CreateDefaultSubobject<UTLActionComponent>("ActionComp");
+
 	GetCharacterMovement()->bOrientRotationToMovement = true; // Face character model in direction the character is moving
 
 	bUseControllerRotationYaw = false; // Don't rotate the character based on Mouse X
@@ -47,6 +50,11 @@ void ATLCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
+}
+
+FVector ATLCharacter::GetPawnViewLocation() const
+{
+	return CameraComp->GetComponentLocation();
 }
 
 
@@ -85,6 +93,9 @@ void ATLCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	PlayerInputComponent->BindAxis("MoveForward", this, &ATLCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &ATLCharacter::MoveRight);
 
+	PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &ATLCharacter::SprintStart);
+	PlayerInputComponent->BindAction("Sprint", IE_Released, this, &ATLCharacter::SprintStop);
+
 	PlayerInputComponent->BindAxis("Turn", this, &ATLCharacter::AddControllerYawInput);
 	PlayerInputComponent->BindAxis("LookUp", this, &ATLCharacter::AddControllerPitchInput);
 
@@ -93,7 +104,6 @@ void ATLCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ATLCharacter::Jump);
 	PlayerInputComponent->BindAction("SecondaryAttack", IE_Pressed, this, &ATLCharacter::SecondaryAttack);
 	PlayerInputComponent->BindAction("UltimateAttack", IE_Pressed, this, &ATLCharacter::UltimateAttack);
-	
 }
 
 void ATLCharacter::PostInitializeComponents()
@@ -127,36 +137,34 @@ void ATLCharacter::MoveRight(float Value)
 	AddMovementInput(RightVector, Value);
 }
 
+
+void ATLCharacter::SprintStart()
+{
+	ActionComp->StartActionByName(this, "Sprint");
+}
+
+
+void ATLCharacter::SprintStop()
+{
+	ActionComp->StopActionByName(this, "Sprint");
+}
+
+
 void ATLCharacter::PrimaryAttack()
 {
-	if (!GetWorldTimerManager().IsTimerActive(TimerHandle_SpawnAttack))
-	{
-		PlayAnimMontage(AttackAnim);
-		GetWorldTimerManager().SetTimer(TimerHandle_SpawnAttack, this, &ATLCharacter::SpawnAttack_TimeElapsed, 0.2f);
-		LastRequestProjectileClass = ProjectileClassPrimary;
-	}
+	ActionComp->StartActionByName(this, "PrimaryAttack");
 }
 
 
 void ATLCharacter::SecondaryAttack()
 {
-	if (!GetWorldTimerManager().IsTimerActive(TimerHandle_SpawnAttack))
-	{
-		PlayAnimMontage(AttackAnim);
-		GetWorldTimerManager().SetTimer(TimerHandle_SpawnAttack, this, &ATLCharacter::SpawnAttack_TimeElapsed, 0.2f);
-		LastRequestProjectileClass = ProjectileClassSecondary;
-	}
+	ActionComp->StartActionByName(this, "Dash");
 }
 
 
 void ATLCharacter::UltimateAttack()
 {
-	if (!GetWorldTimerManager().IsTimerActive(TimerHandle_SpawnAttack))
-	{
-		PlayAnimMontage(AttackAnim);
-		GetWorldTimerManager().SetTimer(TimerHandle_SpawnAttack, this, &ATLCharacter::SpawnAttack_TimeElapsed, 0.2f);
-		LastRequestProjectileClass = ProjectileClassUltimate;
-	}
+	ActionComp->StartActionByName(this, "Blackhole");
 }
 
 
