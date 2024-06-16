@@ -8,6 +8,7 @@
 #include "AI/TLAICharacter.h"
 #include "TLAttributeComponent.h"
 #include "EngineUtils.h"
+#include "TLCharacter.h"
 
 
 ATLGameModeBase::ATLGameModeBase()
@@ -64,6 +65,35 @@ void ATLGameModeBase::OnQueryCompleted(TSharedPtr<FEnvQueryResult> Result)
 	{
 		GetWorld()->SpawnActor<AActor>(MinionClass, Locations[0], FRotator::ZeroRotator);
 	}
+}
+
+
+void ATLGameModeBase::RespawnPlayerElapsed(AController* Controller)
+{
+	if (ensure(Controller))
+	{
+		Controller->UnPossess();
+
+		RestartPlayer(Controller);
+	}
+}
+
+
+void ATLGameModeBase::OnActorKilled(AActor* VictimActor, AActor* Killer)
+{
+	ATLCharacter* PlayerCharacter = Cast<ATLCharacter>(VictimActor);
+	if (PlayerCharacter)
+	{
+		FTimerHandle TimerHandle_RespawnDelay;
+		FTimerDelegate Delegate;
+		Delegate.BindUFunction(this, "RespawnPlayerElapsed", PlayerCharacter->GetController());
+
+		float RespawnDelay = 2.0f;
+		GetWorldTimerManager().SetTimer(TimerHandle_RespawnDelay, Delegate, RespawnDelay, false);
+
+	}
+	
+	UE_LOG(LogTemp, Log, TEXT("OnActorKilled: Victim: %s, Killer: %s"), *GetNameSafe(VictimActor), *GetNameSafe(Killer));
 }
 
 

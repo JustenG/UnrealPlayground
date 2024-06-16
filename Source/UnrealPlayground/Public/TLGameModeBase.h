@@ -46,6 +46,13 @@ protected:
 
 	void OnQueryCompleted(TSharedPtr<FEnvQueryResult> Result); // See EnvQueryType.h Line 586 for FQueryFinishedSignature def
 
+	UFUNCTION()
+	void RespawnPlayerElapsed(AController* Controller);
+
+public:
+
+	virtual void OnActorKilled(AActor* VictimActor, AActor* Killer);
+
 // Commands/Cheats
 public:
 

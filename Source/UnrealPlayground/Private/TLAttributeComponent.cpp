@@ -2,6 +2,7 @@
 
 
 #include "TLAttributeComponent.h"
+#include "TLGameModeBase.h"
 
 // Sets default values for this component's properties
 UTLAttributeComponent::UTLAttributeComponent()
@@ -56,6 +57,15 @@ bool UTLAttributeComponent::ApplyHealthChange(AActor* InstigatorActor, float Del
 	Health = HealthNew;
 
 	OnHealthChanged.Broadcast(InstigatorActor, this, Health, DeltaClamped);
+
+	if (DeltaClamped < 0.0f && Health <= 0.0f)
+	{
+		ATLGameModeBase* GameMode = GetWorld()->GetAuthGameMode<ATLGameModeBase>();
+		if (GameMode)
+		{
+			GameMode->OnActorKilled(GetOwner(), InstigatorActor);
+		}
+	}
 
 	return DeltaClamped > 0;
 }
