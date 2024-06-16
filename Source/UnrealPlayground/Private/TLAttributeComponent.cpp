@@ -11,6 +11,12 @@ UTLAttributeComponent::UTLAttributeComponent()
 }
 
 
+bool UTLAttributeComponent::Kill(AActor* InstigatorActor)
+{
+	return ApplyHealthChange(InstigatorActor, -GetHealthMax());
+}
+
+
 bool UTLAttributeComponent::IsAlive() const
 {
 	return Health > 0.0f;

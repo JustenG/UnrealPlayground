@@ -94,4 +94,10 @@ protected:
 	UFUNCTION()
 	void OnActorOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
+// Commands/Cheats
+public:
+
+	UFUNCTION(Exec)
+	void HealSelf(float Amount = 0);
+
 };

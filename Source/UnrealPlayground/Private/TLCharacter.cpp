@@ -245,3 +245,13 @@ void ATLCharacter::OnActorOverlap(UPrimitiveComponent* OverlappedComponent, AAct
 		ITLGameplayInterface::Execute_Interact(OtherActor, this, ETLInteractionType::EBT_CONTACT);
 	}
 }
+
+
+void ATLCharacter::HealSelf(float Amount  /* = 0 */)
+{
+	if (Amount == 0)
+	{
+		Amount = AttributeComp->GetHealthMax();
+	}
+	AttributeComp->ApplyHealthChange(this, Amount);
+}

@@ -33,6 +33,9 @@ public:
 	FOnHealthChanged OnHealthChanged;
 
 	UFUNCTION(BlueprintCallable, Category = "Attributes")
+	bool Kill(AActor* InstigatorActor);
+
+	UFUNCTION(BlueprintCallable, Category = "Attributes")
 	bool IsAlive() const;
 
 	UFUNCTION(BlueprintCallable, Category = "Attributes")

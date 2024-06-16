@@ -46,4 +46,10 @@ protected:
 
 	void OnQueryCompleted(TSharedPtr<FEnvQueryResult> Result); // See EnvQueryType.h Line 586 for FQueryFinishedSignature def
 
+// Commands/Cheats
+public:
+
+	UFUNCTION(Exec)
+	void KillAll();
+
 };

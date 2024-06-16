@@ -65,3 +65,17 @@ void ATLGameModeBase::OnQueryCompleted(TSharedPtr<FEnvQueryResult> Result)
 		GetWorld()->SpawnActor<AActor>(MinionClass, Locations[0], FRotator::ZeroRotator);
 	}
 }
+
+
+void ATLGameModeBase::KillAll()
+{
+	for (TActorIterator<ATLAICharacter> Iterator(GetWorld()); Iterator; ++Iterator)
+	{
+		ATLAICharacter* Bot = *Iterator;
+		UTLAttributeComponent* AttributeComp = UTLAttributeComponent::GetAttributes(Bot);
+		if (ensure(AttributeComp) && AttributeComp->IsAlive())
+		{
+			AttributeComp->Kill(this);
+		}
+	}
+}
