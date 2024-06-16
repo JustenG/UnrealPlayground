@@ -10,6 +10,8 @@
 #include "Particles/ParticleSystemComponent.h"
 #include "Sound/SoundCue.h"
 #include "TLAttributeComponent.h"
+#include "TLGameplayFunctionLibrary.h"
+
 
 // Sets default values
 ATLMagicProjectile::ATLMagicProjectile()
@@ -82,10 +84,8 @@ void ATLMagicProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComponent
 {
 	if (OtherActor && OtherActor != GetInstigator())
 	{
-		UTLAttributeComponent* AttributeComp = Cast<UTLAttributeComponent>(OtherActor->GetComponentByClass(UTLAttributeComponent::StaticClass()));
-		if (AttributeComp)
+		if (UTLGameplayFunctionLibrary::ApplyDirectionalDamage(GetInstigator(), OtherActor, DamageAmount, SweepResult))
 		{
-			AttributeComp->ApplyHealthChange(GetInstigator(), - DamageAmount);
 			HandleMagicProjectileImpact();
 		}
 	}

@@ -56,6 +56,8 @@ public:
 
 	void FindInteractiveObjects();
 
+	bool InteractDirect(FVector Start, FVector End);
+
 	bool InteractDirect();
 
 	bool InteractNearby();

@@ -4,6 +4,11 @@
 #include "TLAttributeComponent.h"
 #include "TLGameModeBase.h"
 
+
+static TAutoConsoleVariable<float> CVarDamageMultiplier(TEXT("tl.DamageMultiplier"), 1.0f, TEXT("Global Damage Modifier for Attribute Component."), ECVF_Cheat);
+
+
+
 // Sets default values for this component's properties
 UTLAttributeComponent::UTLAttributeComponent()
 {
@@ -50,6 +55,17 @@ float UTLAttributeComponent::GetHealthPercentage() const
 
 bool UTLAttributeComponent::ApplyHealthChange(AActor* InstigatorActor, float Delta)
 {
+	if (!GetOwner()->CanBeDamaged() && Delta < 0.0f)
+	{
+		return false;
+	}
+
+	if (Delta < 0.0f)
+	{
+		const float DamageMultiplier = CVarDamageMultiplier.GetValueOnGameThread();
+		Delta *= DamageMultiplier;
+	}
+
 	float HealthOld = Health;
 	float HealthNew = FMath::Clamp(Health + Delta, 0.0f, HealthMax);
 	float DeltaClamped = HealthNew - HealthOld;
@@ -67,7 +83,7 @@ bool UTLAttributeComponent::ApplyHealthChange(AActor* InstigatorActor, float Del
 		}
 	}
 
-	return DeltaClamped > 0;
+	return DeltaClamped != 0;
 }
 
 

@@ -1,12 +1,13 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "TLGameItem.h"
+#include "TLPickupItem.h"
 
 #include "TLInteractionComponent.h"
 
+
 // Sets default values
-ATLGameItem::ATLGameItem()
+ATLPickupItem::ATLPickupItem()
 {
 	bIsActive = true;
 	bRespawns = true;
@@ -17,22 +18,25 @@ ATLGameItem::ATLGameItem()
 	RootComponent = MeshComp;
 }
 
-void ATLGameItem::Interact_Implementation(APawn* InstigatorPawn, ETLInteractionType InteractionTypeUsed)
+
+void ATLPickupItem::Interact_Implementation(APawn* InstigatorPawn, ETLInteractionType InteractionTypeUsed)
 {
 	// Implement in derived classes
 }
 
-void ATLGameItem::UseGameItem()
+
+void ATLPickupItem::HideAndStartRespawnTimer()
 {
 	bIsActive = false;
 
 	MeshComp->SetVisibility(false, true);
 
 	GetWorldTimerManager().ClearTimer(TimerHandle_RespawnDelay);
-	GetWorldTimerManager().SetTimer(TimerHandle_RespawnDelay, this, &ATLGameItem::RespawnGameItem, RespawnDelay);
+	GetWorldTimerManager().SetTimer(TimerHandle_RespawnDelay, this, &ATLPickupItem::RespawnGameItem, RespawnDelay);
 }
 
-void ATLGameItem::RespawnGameItem()
+
+void ATLPickupItem::RespawnGameItem()
 {
 	bIsActive = true;
 

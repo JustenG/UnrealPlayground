@@ -31,6 +31,9 @@ protected:
 	FTimerHandle TimerHandle_SpawnBots;
 
 	UPROPERTY(EditDefaultsOnly, Category = "AI")
+	float CreditsPerKill;
+
+	UPROPERTY(EditDefaultsOnly, Category = "AI")
 	float SpawnTimerInterval;
 
 	UPROPERTY(EditDefaultsOnly, Category = "AI")
@@ -42,9 +45,23 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "AI")
 	UEnvQuery* SpawnBotQuery;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Pickup Items")
+	UEnvQuery* SpawnPickupItemQuery;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Pickup Items")
+	int32 PickupItemSpawnCount;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Pickup Items")
+	float PickupItemSpawnDistanceMin;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Pickup Items")
+	TArray<TSubclassOf<AActor>> PickupItemTypes;
+
 	void SpawnBotTimerElapsed();
 
-	void OnQueryCompleted(TSharedPtr<FEnvQueryResult> Result); // See EnvQueryType.h Line 586 for FQueryFinishedSignature def
+	void SpawnBotQueryCompleted(TSharedPtr<FEnvQueryResult> Result); // See EnvQueryType.h Line 586 for FQueryFinishedSignature def
+	
+	void SpawnPickupItemQueryCompleted(TSharedPtr<FEnvQueryResult> Result); // See EnvQueryType.h Line 586 for FQueryFinishedSignature def
 
 	UFUNCTION()
 	void RespawnPlayerElapsed(AController* Controller);

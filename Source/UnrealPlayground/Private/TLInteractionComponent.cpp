@@ -9,6 +9,10 @@
 #include "DrawDebugHelpers.h"
 
 
+static TAutoConsoleVariable<bool> CVarDebugDrawInteraction(TEXT("tl.DebugDraw.Interaction"), false, TEXT("Enable Debug Lines for Interact Component."), ECVF_Cheat);
+
+
+
 // Sets default values for this component's properties
 UTLInteractionComponent::UTLInteractionComponent()
 {
@@ -38,6 +42,8 @@ float UTLInteractionComponent::GetMaxInteractDistance_Implementation()
 
 void UTLInteractionComponent::FindInteractiveObjects()
 {
+	const bool bDebugDraw = CVarDebugDrawInteraction.GetValueOnGameThread();
+
 	AActor* MyOwner = GetOwner();
 
 	MyOwner->GetWorldTimerManager().ClearTimer(TimerHandle_PollRateDelay);
@@ -71,8 +77,53 @@ void UTLInteractionComponent::FindInteractiveObjects()
 
 	LastPollLocation = MyOwner->GetActorLocation();
 
-	//DrawDebugSphere(GetWorld(), LastPollLocation, PollRadius, 32.0f, FColor::Emerald, false, 2.0f);
-	//UE_LOG(LogTemp, Log, TEXT("Updated Players InteractableObjects: %d"), InteractableObjects.Num());
+	if (bDebugDraw)
+	{
+		DrawDebugSphere(GetWorld(), LastPollLocation, MaxInteractDistance, 32.0f, FColor::Blue, false, 2.0f);
+		UE_LOG(LogTemp, Log, TEXT("Updated Players InteractableObjects: %d"), InteractableActorsNearby.Num());
+	}
+}
+
+
+bool UTLInteractionComponent::InteractDirect(FVector Start, FVector End)
+{
+	const bool bDebugDraw = CVarDebugDrawInteraction.GetValueOnGameThread();
+	
+	AActor* MyOwner = GetOwner();
+
+	FCollisionObjectQueryParams ObjectQueryParams;
+	ObjectQueryParams.AddObjectTypesToQuery(CollisionChannel);
+
+	TArray<FHitResult> Hits;
+	FCollisionShape Shape;
+	Shape.SetSphere(MaxContactDistance);
+	bool bBlockingHit = GetWorld()->SweepMultiByObjectType(Hits, Start, End, FQuat::Identity, ObjectQueryParams, Shape);
+
+	FColor LineColor = bBlockingHit ? FColor::Green : FColor::Red;
+
+	if (bDebugDraw)
+	{
+		DrawDebugLine(GetWorld(), Start, End, LineColor, false, 2.0f, 0, 0.0f);
+	}
+
+	FVector CurrentOwnerLocation = MyOwner->GetActorLocation();
+	for (FHitResult Hit : Hits)
+	{
+		AActor* HitActor = Hit.GetActor();
+		if (HitActor)
+		{
+			if (HitActor->Implements<UTLGameplayInterface>() && FVector::Distance(CurrentOwnerLocation, HitActor->GetActorLocation()) < MaxInteractDistance)
+			{
+				ITLGameplayInterface::Execute_Interact(HitActor, Cast<APawn>(MyOwner), ETLInteractionType::EBT_DIRECT);
+				if (bDebugDraw)
+				{
+					DrawDebugSphere(GetWorld(), HitActor->GetActorLocation(), 12, 32, FColor::Green, false, 0.0f);
+				}
+				return true;
+			}
+		}
+	}
+	return false;
 }
 
 
@@ -80,34 +131,12 @@ bool UTLInteractionComponent::InteractDirect()
 {
 	AActor* MyOwner = GetOwner();
 
-	FCollisionObjectQueryParams ObjectQueryParams;
-	ObjectQueryParams.AddObjectTypesToQuery(CollisionChannel);
-
 	FVector EyeLocation;
 	FRotator EyeRotation;
 	MyOwner->GetActorEyesViewPoint(EyeLocation, EyeRotation);
 	FVector End = EyeLocation + (EyeRotation.Vector() * MaxInteractDistance);
 
-	TArray<FHitResult> Hits;
-	FCollisionShape Shape;
-	Shape.SetSphere(MaxContactDistance);
-	bool bBlockingHit = GetWorld()->SweepMultiByObjectType(Hits, EyeLocation, End, FQuat::Identity, ObjectQueryParams, Shape);
-
-	FColor LineColor = bBlockingHit ? FColor::Green : FColor::Red;
-
-	for (FHitResult Hit : Hits)
-	{
-		AActor* HitActor = Hit.GetActor();
-		if (HitActor)
-		{
-			if (HitActor->Implements<UTLGameplayInterface>())
-			{
-				ITLGameplayInterface::Execute_Interact(HitActor, Cast<APawn>(MyOwner), ETLInteractionType::EBT_DIRECT);
-				return true;
-			}
-		}
-	}
-	return false;
+	return InteractDirect(EyeLocation, End);
 }
 
 
@@ -117,6 +146,8 @@ bool UTLInteractionComponent::InteractNearby()
 	{
 		return false;
 	}
+
+	const bool bDebugDraw = CVarDebugDrawInteraction.GetValueOnGameThread();
 
 	AActor* MyOwner = GetOwner();
 	FVector CurrentOwnerLocation = MyOwner->GetActorLocation();
@@ -129,12 +160,21 @@ bool UTLInteractionComponent::InteractNearby()
 		{
 			ClosestActor = OtherActor;
 		}
+
+		if (bDebugDraw)
+		{
+			DrawDebugSphere(GetWorld(), OtherActor->GetActorLocation(), 10, 16, FColor::Yellow, false, 0.0f);
+		}
 	}
 
 	if (ClosestActor)
 	{
 		APawn* MyPawn = Cast<APawn>(MyOwner);
 		ITLGameplayInterface::Execute_Interact(ClosestActor, MyPawn, ETLInteractionType::EBT_NEARBY);
+		if (bDebugDraw)
+		{
+			DrawDebugSphere(GetWorld(), ClosestActor->GetActorLocation(), 12, 32, FColor::Green, false, 0.0f);
+		}
 		return true;
 	}
 	return false;

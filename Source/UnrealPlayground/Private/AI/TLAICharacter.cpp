@@ -23,6 +23,8 @@ ATLAICharacter::ATLAICharacter()
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 
 	TimeToHitParamName = "TimeToHit";
+
+	GetMesh()->SetGenerateOverlapEvents(true);
 }
 
 
@@ -104,6 +106,9 @@ void ATLAICharacter::OnHealthChanged(AActor* InstigatorActor, UTLAttributeCompon
 			// Enable Actor Ragdoll
 			GetMesh()->SetAllBodiesSimulatePhysics(true);
 			GetMesh()->SetCollisionProfileName("Ragdoll");
+
+			GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+			GetCharacterMovement()->DisableMovement();
 
 			// Define when the Actor should be cleaned up by the engine
 			SetLifeSpan(10.0f);

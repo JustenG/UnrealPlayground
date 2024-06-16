@@ -3,21 +3,27 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "TLGameItem.h"
-#include "TLInteractionType.h"
-#include "TLHealthPotion.generated.h"
+#include "TLPickupItem.h"
+#include "TLPickupItem_Credits.generated.h"
 
-
+/**
+ * 
+ */
 UCLASS()
-class UNREALPLAYGROUND_API ATLHealthPotion : public ATLGameItem
+class UNREALPLAYGROUND_API ATLPickupItem_Credits : public ATLPickupItem
 {
 	GENERATED_BODY()
-	
-public:	
-	// Sets default values for this actor's properties
-	ATLHealthPotion();
 
-// Custom Code
+public:
+	// Sets default values for this actor's properties
+	ATLPickupItem_Credits();
+
+	// Custom Code
+protected:
+
+	UPROPERTY(EditDefaultsOnly, Category = "Credits")
+	int32 CreditsGranted;
+
 public:
 
 	virtual void Interact_Implementation(APawn* InstigatorPawn, ETLInteractionType InteractionTypeUsed) override;

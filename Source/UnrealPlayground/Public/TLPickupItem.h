@@ -5,18 +5,18 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "TLGameplayInterface.h"
-#include "TLGameItem.generated.h"
+#include "TLPickupItem.generated.h"
 
 class UStaticMeshComponent;
 
 UCLASS()
-class UNREALPLAYGROUND_API ATLGameItem : public AActor, public ITLGameplayInterface
+class UNREALPLAYGROUND_API ATLPickupItem : public AActor, public ITLGameplayInterface
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	ATLGameItem();
+	ATLPickupItem();
 
 protected:
 
@@ -46,7 +46,7 @@ protected:
 	//UFUNCTION()
 	//void OnActorOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
-	void UseGameItem();
+	void HideAndStartRespawnTimer();
 
 	void RespawnGameItem();
 
