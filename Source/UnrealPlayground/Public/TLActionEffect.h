@@ -34,9 +34,10 @@ protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "Effect")
 	void ExecutePeriodicEffect(AActor* Instigator);
 
-	virtual void OnStartAction_Implementation(AActor* Instigator) override;
+public:
 
-	virtual void OnStopAction_Implementation(AActor* Instigator) override;
+	virtual void StartAction(AActor* Instigator) override;
 
-	virtual void BeforeStopAction_Implementation(AActor* Instigator) override;
+	virtual void StopAction(AActor* Instigator) override;
+
 };

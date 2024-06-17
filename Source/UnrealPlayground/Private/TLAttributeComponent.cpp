@@ -14,6 +14,8 @@ UTLAttributeComponent::UTLAttributeComponent()
 {
 	HealthMax = 100;
 	Health = HealthMax;
+	RageMax = 20;
+	Rage = 0;
 }
 
 
@@ -44,6 +46,21 @@ float UTLAttributeComponent::GetHealth() const
 float UTLAttributeComponent::GetHealthMax() const
 {
 	return HealthMax;
+}
+
+float UTLAttributeComponent::GetRage() const
+{
+	return Rage;
+}
+
+float UTLAttributeComponent::GetRagehMax() const
+{
+	return RageMax;
+}
+
+bool UTLAttributeComponent::IsRageFull() const
+{
+	return Rage >= RageMax;
 }
 
 
@@ -83,6 +100,19 @@ bool UTLAttributeComponent::ApplyHealthChange(AActor* InstigatorActor, float Del
 		}
 	}
 
+	return DeltaClamped != 0;
+}
+
+
+bool UTLAttributeComponent::ApplyRageChange(AActor* InstigatorActor, float Delta)
+{
+	float RageOld = Rage;
+	float RageNew = FMath::Clamp(Rage + Delta, 0.0f, RageMax);
+	float DeltaClamped = RageNew - RageOld;
+	Rage = RageNew;
+
+	OnRageChanged.Broadcast(InstigatorActor, this, Rage, DeltaClamped);
+	
 	return DeltaClamped != 0;
 }
 

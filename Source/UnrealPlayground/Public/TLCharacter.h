@@ -93,9 +93,6 @@ protected:
 	void SecondaryAttack();
 	void UltimateAttack();
 
-	void SpawnAttack_TimeElapsed();	
-	void SpawnAttack(TSubclassOf<AActor>& ProjectileClass);
-
 	void PrimaryInteract();
 
 	UFUNCTION()

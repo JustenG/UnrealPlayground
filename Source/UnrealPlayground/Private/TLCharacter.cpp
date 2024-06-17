@@ -168,44 +168,6 @@ void ATLCharacter::UltimateAttack()
 }
 
 
-void ATLCharacter::SpawnAttack_TimeElapsed()
-{
-	SpawnAttack(LastRequestProjectileClass);
-}
-
-
-void ATLCharacter::SpawnAttack(TSubclassOf<AActor>& ProjectileClass)
-{
-	FVector HandLocation = GetMesh()->GetSocketLocation(AttackSpawnBoneParamName);
-
-	FVector Start = CameraComp->GetComponentLocation();
-	FVector Forward = CameraComp->GetForwardVector();
-	FVector End = Start + (Forward * 10000);
-
-	FHitResult Hit;
-	FCollisionObjectQueryParams ObjectQueryParams;
-	ObjectQueryParams.AddObjectTypesToQuery(ECC_WorldStatic);
-	ObjectQueryParams.AddObjectTypesToQuery(ECC_WorldDynamic);
-	ObjectQueryParams.AddObjectTypesToQuery(ECC_Pawn);
-	GetWorld()->LineTraceSingleByObjectType(Hit, Start, End, ObjectQueryParams);
-
-	FVector Traget = Hit.IsValidBlockingHit() ? Hit.ImpactPoint : End;
-	FRotator ProjectileRotation = FRotationMatrix::MakeFromX(Traget - HandLocation).Rotator();
-
-	FTransform PrimaryAttackSpawnTM = FTransform(ProjectileRotation, HandLocation);
-
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	SpawnParams.Instigator = this;
-
-	GetWorld()->SpawnActor<AActor>(ProjectileClass, PrimaryAttackSpawnTM, SpawnParams);
-
-	UGameplayStatics::SpawnEmitterAttached(AttackVFX, GetMesh(), AttackSpawnBoneParamName, FVector::ZeroVector, FRotator::ZeroRotator, EAttachLocation::SnapToTarget, true, EPSCPoolMethod::AutoRelease);
-
-	GetWorldTimerManager().ClearTimer(TimerHandle_SpawnAttack);
-}
-
-
 void ATLCharacter::PrimaryInteract()
 {
 	// Direct Camera Interaction 
@@ -225,6 +187,8 @@ void ATLCharacter::OnHealthChanged(AActor* InstigatorActor, UTLAttributeComponen
 	if (Delta < 0.0f)
 	{
 		GetMesh()->SetScalarParameterValueOnMaterials(TimeToHitParamName, static_cast<float>(GetWorld()->TimeSeconds));
+
+		AttributeComp->ApplyRageChange(InstigatorActor, FMath::Abs(Delta));
 	}
 
 	// Died

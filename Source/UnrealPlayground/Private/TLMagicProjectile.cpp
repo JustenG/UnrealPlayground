@@ -99,7 +99,7 @@ void ATLMagicProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComponent
 		{
 			HandleMagicProjectileImpact();
 
-			if (ActionComp)
+			if (ActionComp && BurningActionClass)
 			{
 				ActionComp->AddAction(GetInstigator(), BurningActionClass);
 			}

@@ -19,8 +19,10 @@ void UTLActionEffect::ExecutePeriodicEffect_Implementation(AActor* Instigator)
 }
 
 
-void UTLActionEffect::OnStartAction_Implementation(AActor* Instigator)
+void UTLActionEffect::StartAction(AActor* Instigator)
 {
+	Super::StartAction(Instigator);
+
 	if (Duration > 0.0f)
 	{
 		FTimerDelegate Delegate;
@@ -39,8 +41,15 @@ void UTLActionEffect::OnStartAction_Implementation(AActor* Instigator)
 }
 
 
-void UTLActionEffect::OnStopAction_Implementation(AActor* Instigator)
+void UTLActionEffect::StopAction(AActor* Instigator)
 {
+	if (GetWorld()->GetTimerManager().GetTimerRemaining(PeriodHandle) < KINDA_SMALL_NUMBER)
+	{
+		ExecutePeriodicEffect(Instigator);
+	}
+
+	Super::StopAction(Instigator);
+
 	GetWorld()->GetTimerManager().ClearTimer(PeriodHandle);
 	GetWorld()->GetTimerManager().ClearTimer(DurationHandle);
 
@@ -48,14 +57,5 @@ void UTLActionEffect::OnStopAction_Implementation(AActor* Instigator)
 	if (Comp)
 	{
 		Comp->RemoveAction(this);
-	}
-}
-
-
-void UTLActionEffect::BeforeStopAction_Implementation(AActor* Instigator)
-{
-	if (GetWorld()->GetTimerManager().GetTimerRemaining(PeriodHandle) < KINDA_SMALL_NUMBER)
-	{
-		ExecutePeriodicEffect(Instigator);
 	}
 }

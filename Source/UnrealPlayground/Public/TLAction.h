@@ -61,9 +61,11 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category = "Action")
 	bool CanStart(AActor* Instigator);
 
-	void StartAction(AActor* Instigator);
+	UFUNCTION()
+	virtual void StartAction(AActor* Instigator);
 
-	void StopAction(AActor* Instigator);
+	UFUNCTION()
+	virtual void StopAction(AActor* Instigator);
 
 	UWorld* GetWorld() const override;
 };

@@ -15,24 +15,6 @@ UTLAction_ProjectileAttack::UTLAction_ProjectileAttack()
 }
 
 
-void UTLAction_ProjectileAttack::OnStartAction_Implementation(AActor* Instigator)
-{
-	ACharacter* Character = Cast<ACharacter>(Instigator);
-	if (Character)
-	{
-		Character->PlayAnimMontage(AttackAnim);
-
-		UGameplayStatics::SpawnEmitterAttached(AttackVFX, Character->GetMesh(), HandSocketName, FVector::ZeroVector, FRotator::ZeroRotator, EAttachLocation::SnapToTarget);
-
-		FTimerHandle TimerHandle_AttackDelay;
-		FTimerDelegate Delegate;
-		Delegate.BindUFunction(this, "AttackDelay_Elapsed", Character);
-
-		GetWorld()->GetTimerManager().SetTimer(TimerHandle_AttackDelay, Delegate, AttackAnimDelay, false);
-	}
-}
-
-
 void UTLAction_ProjectileAttack::AttackDelay_Elapsed(ACharacter* InstigatorCharacter)
 {
 	if (ensureAlways(ProjectileClass))
@@ -63,4 +45,24 @@ void UTLAction_ProjectileAttack::AttackDelay_Elapsed(ACharacter* InstigatorChara
 	}
 
 	StopAction(InstigatorCharacter);
+}
+
+
+void UTLAction_ProjectileAttack::StartAction(AActor* Instigator)
+{
+	Super::StartAction(Instigator);
+
+	ACharacter* Character = Cast<ACharacter>(Instigator);
+	if (Character)
+	{
+		Character->PlayAnimMontage(AttackAnim);
+
+		UGameplayStatics::SpawnEmitterAttached(AttackVFX, Character->GetMesh(), HandSocketName, FVector::ZeroVector, FRotator::ZeroRotator, EAttachLocation::SnapToTarget);
+
+		FTimerHandle TimerHandle_AttackDelay;
+		FTimerDelegate Delegate;
+		Delegate.BindUFunction(this, "AttackDelay_Elapsed", Character);
+
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle_AttackDelay, Delegate, AttackAnimDelay, false);
+	}
 }
