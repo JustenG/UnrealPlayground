@@ -37,8 +37,14 @@ protected:
 	UPROPERTY()
 	UTLWorldUserWidget* ActiveHealthBar;
 
+	UPROPERTY()
+	UTLWorldUserWidget* ActiveAlert;
+
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
 	TSubclassOf<UUserWidget> HealthBarWidgetClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
+	TSubclassOf<UUserWidget> AlertWidgetClass;
 
 	UPROPERTY(VisibleAnywhere, Category = "Effects")
 	FName TimeToHitParamName;

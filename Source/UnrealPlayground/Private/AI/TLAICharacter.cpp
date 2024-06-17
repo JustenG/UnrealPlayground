@@ -66,6 +66,15 @@ void ATLAICharacter::OnPawnSeen(APawn* Pawn)
 	{
 		AIC->GetBlackboardComponent()->SetValueAsObject(TargetActorKey, Pawn);
 
+		if (!ActiveAlert && ensure(AlertWidgetClass))
+		{
+			ActiveAlert = CreateWidget<UTLWorldUserWidget>(GetWorld(), AlertWidgetClass);
+			if (ActiveAlert)
+			{
+				ActiveAlert->AttachedActor = this;
+				ActiveAlert->AddToViewport();
+			}
+		}
 		DrawDebugString(GetWorld(), GetActorLocation(), "PLAYER SPOTTED", nullptr, FColor::White, 0.5f, true);	
 	}
 }
