@@ -28,7 +28,8 @@ void UTLInteractionComponent::BeginPlay()
 	Super::BeginPlay();
 
 	AActor* MyOwner = GetOwner();
-	if (!MyOwner->GetWorldTimerManager().IsTimerActive(TimerHandle_PollRateDelay))
+	APawn* MyPawn = Cast<APawn>(MyOwner);
+	if (MyPawn->IsLocallyControlled() && !MyOwner->GetWorldTimerManager().IsTimerActive(TimerHandle_PollRateDelay))
 	{
 		MyOwner->GetWorldTimerManager().SetTimer(TimerHandle_PollRateDelay, this, &UTLInteractionComponent::FindInteractiveObjects, PollRateDelay);
 	}
@@ -114,7 +115,9 @@ bool UTLInteractionComponent::InteractDirect(FVector Start, FVector End)
 		{
 			if (HitActor->Implements<UTLGameplayInterface>() && FVector::Distance(CurrentOwnerLocation, HitActor->GetActorLocation()) < MaxInteractDistance)
 			{
-				ITLGameplayInterface::Execute_Interact(HitActor, Cast<APawn>(MyOwner), ETLInteractionType::EBT_DIRECT);
+				//ITLGameplayInterface::Execute_Interact(HitActor, Cast<APawn>(MyOwner), ETLInteractionType::EBT_DIRECT);
+				ServerInteract(HitActor, ETLInteractionType::EBT_DIRECT);
+
 				if (bDebugDraw)
 				{
 					DrawDebugSphere(GetWorld(), HitActor->GetActorLocation(), 12, 32, FColor::Green, false, 0.0f);
@@ -169,8 +172,10 @@ bool UTLInteractionComponent::InteractNearby()
 
 	if (ClosestActor)
 	{
-		APawn* MyPawn = Cast<APawn>(MyOwner);
-		ITLGameplayInterface::Execute_Interact(ClosestActor, MyPawn, ETLInteractionType::EBT_NEARBY);
+		//APawn* MyPawn = Cast<APawn>(MyOwner);
+		//ITLGameplayInterface::Execute_Interact(ClosestActor, MyPawn, ETLInteractionType::EBT_NEARBY);
+		ServerInteract(ClosestActor, ETLInteractionType::EBT_NEARBY);
+
 		if (bDebugDraw)
 		{
 			DrawDebugSphere(GetWorld(), ClosestActor->GetActorLocation(), 12, 32, FColor::Green, false, 0.0f);
@@ -178,4 +183,17 @@ bool UTLInteractionComponent::InteractNearby()
 		return true;
 	}
 	return false;
+}
+
+
+void UTLInteractionComponent::ServerInteract_Implementation(AActor* TargetActor, ETLInteractionType InteractionType)
+{
+	if (TargetActor == nullptr)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, "No Focus Actor to interact.");
+		return;
+	}
+
+	APawn* MyPawn = Cast<APawn>(GetOwner());
+	ITLGameplayInterface::Execute_Interact(TargetActor, MyPawn, InteractionType);
 }

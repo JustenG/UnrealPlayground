@@ -61,4 +61,7 @@ public:
 	bool InteractDirect();
 
 	bool InteractNearby();
+
+	UFUNCTION(Server, Reliable)
+	void ServerInteract(AActor* TargetActor, ETLInteractionType InteractionType);
 };
