@@ -2,7 +2,7 @@
 
 
 #include "TLItemChest.h"
-
+#include "Net/UnrealNetwork.h"
 
 
 // Sets default values
@@ -18,7 +18,10 @@ ATLItemChest::ATLItemChest()
 	LidMesh->SetupAttachment(BaseMesh);
 
 	TargetPitch = 110;
+
+	SetReplicates(true);
 }
+
 
 // Called when the game starts or when spawned
 void ATLItemChest::BeginPlay()
@@ -26,6 +29,7 @@ void ATLItemChest::BeginPlay()
 	Super::BeginPlay();
 	
 }
+
 
 // Called every frame
 void ATLItemChest::Tick(float DeltaTime)
@@ -35,13 +39,29 @@ void ATLItemChest::Tick(float DeltaTime)
 }
 
 
+void ATLItemChest::OnRep_LidOpened()
+{
+	float CurrentPitch = bLidOpened ? TargetPitch : 0.0f;
+	LidMesh->SetRelativeRotation(FRotator(CurrentPitch, 0, 0));
+}
+
+
 void ATLItemChest::Interact_Implementation(APawn* InstigatorPawn, ETLInteractionType InteractionTypeUsed)
 {
 	if (InteractionTypeUsed == ETLInteractionType::EBT_NEARBY)
 	{
-		LidMesh->SetRelativeRotation(FRotator(TargetPitch, 0, 0));
+		bLidOpened = !bLidOpened;
+		OnRep_LidOpened();
 		//InteractionSuccessful = true;
 		return;
 	}
 	//InteractionSuccessful = false;
+}
+
+
+void ATLItemChest::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ATLItemChest, bLidOpened);
 }
