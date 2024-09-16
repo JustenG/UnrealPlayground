@@ -16,6 +16,8 @@ ATLPickupItem::ATLPickupItem()
 
 	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>("MeshComp");
 	RootComponent = MeshComp;
+
+	SetReplicates(true);
 }
 
 

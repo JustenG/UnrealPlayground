@@ -3,6 +3,7 @@
 
 #include "TLAttributeComponent.h"
 #include "TLGameModeBase.h"
+#include "Net/UnrealNetwork.h"
 
 
 static TAutoConsoleVariable<float> CVarDamageMultiplier(TEXT("tl.DamageMultiplier"), 1.0f, TEXT("Global Damage Modifier for Attribute Component."), ECVF_Cheat);
@@ -16,6 +17,25 @@ UTLAttributeComponent::UTLAttributeComponent()
 	Health = HealthMax;
 	RageMax = 20;
 	Rage = 0;
+
+	SetIsReplicatedByDefault(true);
+}
+
+
+void UTLAttributeComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(UTLAttributeComponent, Health);
+	DOREPLIFETIME(UTLAttributeComponent, HealthMax);
+	DOREPLIFETIME(UTLAttributeComponent, Rage);
+	DOREPLIFETIME(UTLAttributeComponent, RageMax);
+}
+
+
+void UTLAttributeComponent::MulticastHealthChanged_Implementation(AActor* InstigatorActor, float NewHealth, float Delta)
+{
+	OnHealthChanged.Broadcast(InstigatorActor, this, NewHealth, Delta);
 }
 
 
@@ -87,16 +107,19 @@ bool UTLAttributeComponent::ApplyHealthChange(AActor* InstigatorActor, float Del
 	float HealthNew = FMath::Clamp(Health + Delta, 0.0f, HealthMax);
 	float DeltaClamped = HealthNew - HealthOld;
 	
-	Health = HealthNew;
-
-	OnHealthChanged.Broadcast(InstigatorActor, this, Health, DeltaClamped);
-
-	if (DeltaClamped < 0.0f && Health <= 0.0f)
+	if (GetOwner()->HasAuthority())
 	{
-		ATLGameModeBase* GameMode = GetWorld()->GetAuthGameMode<ATLGameModeBase>();
-		if (GameMode)
+		Health = HealthNew;
+
+		MulticastHealthChanged(InstigatorActor, Health, DeltaClamped);
+
+		if (DeltaClamped < 0.0f && Health <= 0.0f)
 		{
-			GameMode->OnActorKilled(GetOwner(), InstigatorActor);
+			ATLGameModeBase* GameMode = GetWorld()->GetAuthGameMode<ATLGameModeBase>();
+			if (GameMode)
+			{
+				GameMode->OnActorKilled(GetOwner(), InstigatorActor);
+			}
 		}
 	}
 

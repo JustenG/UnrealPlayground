@@ -9,6 +9,22 @@
 
 class UWorld;
 
+
+USTRUCT()
+struct FActionRepData
+{
+	GENERATED_BODY()
+
+public:
+
+	UPROPERTY()
+	bool bIsRunning;
+
+	UPROPERTY()
+	AActor* Instigator;
+};
+
+
 /**
  * 
  */
@@ -20,10 +36,11 @@ class UNREALPLAYGROUND_API UTLAction : public UObject
 // Custom Code
 protected:
 
-	bool bIsRunning;
+	UPROPERTY(Replicated)
+	UTLActionComponent* ActionComp;
 
-	UFUNCTION(BlueprintCallable, Category = "Action")
-	UTLActionComponent* GetOwningComponent() const;
+	UPROPERTY(ReplicatedUsing = "OnRep_RepData")
+	FActionRepData RepData;
 
 	/* Tags added to owning actor when activated, removed when action stops */
 	UPROPERTY(EditDefaultsOnly, Category = "Tags")
@@ -32,6 +49,12 @@ protected:
 	/* Action can only start if OwningActor has none of these Tags applied */
 	UPROPERTY(EditDefaultsOnly, Category = "Tags")
 	FGameplayTagContainer BlockedTags;
+
+	UFUNCTION()
+	void OnRep_RepData();
+
+	UFUNCTION(BlueprintCallable, Category = "Action")
+	UTLActionComponent* GetOwningComponent() const;
 
 	UFUNCTION(BlueprintNativeEvent, Category = "Action")
 	void OnStartAction(AActor* Instigator);
@@ -46,6 +69,8 @@ protected:
 	void BeforeStopAction(AActor* Instigator);
 
 public:
+
+	void Initialize(UTLActionComponent* NewActionComp);
 
 	/* Action nickname to start/stop without a reference to the object */
 	UPROPERTY(EditDefaultsOnly, Category = "Action")
@@ -68,4 +93,9 @@ public:
 	virtual void StopAction(AActor* Instigator);
 
 	UWorld* GetWorld() const override;
+
+	bool IsSupportedForNetworking() const override
+	{
+		return true;
+	}
 };

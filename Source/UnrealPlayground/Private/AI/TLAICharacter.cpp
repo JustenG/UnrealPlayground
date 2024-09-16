@@ -48,7 +48,10 @@ void ATLAICharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 void ATLAICharacter::SetTargetActor(AActor* NewTarget)
 {
 	AAIController* AIC = GetController<AAIController>();
-	AIC->GetBlackboardComponent()->SetValueAsObject(TargetActorKey, NewTarget);
+	if (AIC)
+	{
+		AIC->GetBlackboardComponent()->SetValueAsObject(TargetActorKey, NewTarget);
+	}
 }
 
 
@@ -110,7 +113,10 @@ void ATLAICharacter::OnHealthChanged(AActor* InstigatorActor, UTLAttributeCompon
 			}
 
 			AAIController* AIC = GetController<AAIController>();
-			AIC->GetBrainComponent()->StopLogic("Killed");
+			if (AIC)
+			{
+				AIC->GetBrainComponent()->StopLogic("Killed");
+			}
 
 			// Enable Actor Ragdoll
 			GetMesh()->SetAllBodiesSimulatePhysics(true);

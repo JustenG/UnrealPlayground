@@ -39,6 +39,7 @@ ATLMagicProjectile::ATLMagicProjectile()
 	ImpactShakeRadius = 1500.0f;
 	DamageAmount = 20.0f;
 
+	SetReplicates(true);
 }
 
 
@@ -99,7 +100,7 @@ void ATLMagicProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComponent
 		{
 			HandleMagicProjectileImpact();
 
-			if (ActionComp && BurningActionClass)
+			if (ActionComp && BurningActionClass && HasAuthority())
 			{
 				ActionComp->AddAction(GetInstigator(), BurningActionClass);
 			}

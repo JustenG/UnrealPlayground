@@ -21,17 +21,20 @@ public:
 // Custom Code
 protected:
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Attributes" )
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Replicated, Category = "Attributes" )
 	float Health;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Attributes")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Replicated, Category = "Attributes")
 	float HealthMax;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Attributes")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Replicated, Category = "Attributes")
 	float Rage;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Attributes")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Replicated, Category = "Attributes")
 	float RageMax;
+
+	UFUNCTION(NetMulticast, Reliable) // @FIXME: could mark as unreliable once we moved the 'state' out of scharacter (eg. once its cosmetic only)
+	void MulticastHealthChanged(AActor* InstigatorActor, float NewHealth, float Delta);
 
 public:
 
