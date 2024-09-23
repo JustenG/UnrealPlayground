@@ -4,6 +4,15 @@
 #include "TLPickupItem.h"
 
 #include "TLInteractionComponent.h"
+#include "Net/UnrealNetwork.h"
+
+
+void ATLPickupItem::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ATLPickupItem, bIsActive);
+}
 
 
 // Sets default values
@@ -27,11 +36,16 @@ void ATLPickupItem::Interact_Implementation(APawn* InstigatorPawn, ETLInteractio
 }
 
 
+void ATLPickupItem::OnRep_IsActive()
+{
+	MeshComp->SetVisibility(bIsActive, true);
+}
+
+
 void ATLPickupItem::HideAndStartRespawnTimer()
 {
 	bIsActive = false;
-
-	MeshComp->SetVisibility(false, true);
+	OnRep_IsActive();
 
 	GetWorldTimerManager().ClearTimer(TimerHandle_RespawnDelay);
 	GetWorldTimerManager().SetTimer(TimerHandle_RespawnDelay, this, &ATLPickupItem::RespawnGameItem, RespawnDelay);
@@ -41,7 +55,6 @@ void ATLPickupItem::HideAndStartRespawnTimer()
 void ATLPickupItem::RespawnGameItem()
 {
 	bIsActive = true;
-
-	MeshComp->SetVisibility(true, true);
+	OnRep_IsActive();
 }
 

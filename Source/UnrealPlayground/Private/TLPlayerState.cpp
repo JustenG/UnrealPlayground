@@ -2,6 +2,25 @@
 
 
 #include "TLPlayerState.h"
+#include "../UnrealPlayground.h"
+#include "Net/UnrealNetwork.h"
+
+
+void ATLPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ATLPlayerState, Credits);
+}
+
+
+void ATLPlayerState::OnRep_Credits(int32 OldCredits)
+{
+	OnCreditsChanged.Broadcast(this, Credits, Credits - OldCredits);
+
+	FString ActionMsg = FString::Printf(TEXT("[%s] Credits: %d"), *GetNameSafe(GetOwner()), Credits);
+	LogOnScreen(this, ActionMsg, FColor::Black, 10.0f);
+}
 
 
 void ATLPlayerState::AddCredits(int32 Delta)
@@ -13,6 +32,9 @@ void ATLPlayerState::AddCredits(int32 Delta)
 
 	Credits += Delta;
 	OnCreditsChanged.Broadcast(this, Credits, Delta);
+
+	FString ActionMsg = FString::Printf(TEXT("[%s] Credits: %d"), *GetNameSafe(GetOwner()), Credits);
+	LogOnScreen(this, ActionMsg, FColor::Black, 10.0f);
 }
 
 

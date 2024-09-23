@@ -205,7 +205,11 @@ void ATLCharacter::OnActorOverlap(UPrimitiveComponent* OverlappedComponent, AAct
 {
 	if (OtherActor->Implements<UTLGameplayInterface>())
 	{
-		//ITLGameplayInterface::Execute_Interact(OtherActor, this, ETLInteractionType::EBT_CONTACT);
+		// Is Client?
+		if (!GetOwner()->HasAuthority())
+		{
+			ITLGameplayInterface::Execute_Interact(OtherActor, this, ETLInteractionType::EBT_CONTACT);
+		}
 		InteractionComp->ServerInteract(OtherActor, ETLInteractionType::EBT_CONTACT);
 	}
 }

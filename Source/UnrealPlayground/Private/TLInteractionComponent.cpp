@@ -115,7 +115,11 @@ bool UTLInteractionComponent::InteractDirect(FVector Start, FVector End)
 		{
 			if (HitActor->Implements<UTLGameplayInterface>() && FVector::Distance(CurrentOwnerLocation, HitActor->GetActorLocation()) < MaxInteractDistance)
 			{
-				//ITLGameplayInterface::Execute_Interact(HitActor, Cast<APawn>(MyOwner), ETLInteractionType::EBT_DIRECT);
+				// Is Client?
+				if (!GetOwner()->HasAuthority())
+				{
+					ITLGameplayInterface::Execute_Interact(HitActor, Cast<APawn>(MyOwner), ETLInteractionType::EBT_DIRECT);
+				}
 				ServerInteract(HitActor, ETLInteractionType::EBT_DIRECT);
 
 				if (bDebugDraw)
@@ -172,8 +176,12 @@ bool UTLInteractionComponent::InteractNearby()
 
 	if (ClosestActor)
 	{
-		//APawn* MyPawn = Cast<APawn>(MyOwner);
-		//ITLGameplayInterface::Execute_Interact(ClosestActor, MyPawn, ETLInteractionType::EBT_NEARBY);
+		// Is Client?
+		if (!GetOwner()->HasAuthority())
+		{
+			APawn* MyPawn = Cast<APawn>(MyOwner);
+			ITLGameplayInterface::Execute_Interact(ClosestActor, MyPawn, ETLInteractionType::EBT_NEARBY);
+		}
 		ServerInteract(ClosestActor, ETLInteractionType::EBT_NEARBY);
 
 		if (bDebugDraw)

@@ -29,6 +29,7 @@ private:
 
 protected:
 
+	UPROPERTY(ReplicatedUsing="OnRep_IsActive")
 	bool bIsActive;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Game Item")
@@ -45,6 +46,9 @@ protected:
 
 	//UFUNCTION()
 	//void OnActorOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION()
+	void OnRep_IsActive();
 
 	void HideAndStartRespawnTimer();
 

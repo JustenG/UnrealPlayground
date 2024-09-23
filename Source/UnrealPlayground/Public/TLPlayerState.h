@@ -19,11 +19,14 @@ class UNREALPLAYGROUND_API ATLPlayerState : public APlayerState
 
 protected:
 
-	UPROPERTY(EditDefaultsOnly, Category = "Credits")
+	UPROPERTY(EditDefaultsOnly, ReplicatedUsing="OnRep_Credits", Category = "Credits")
 	int32 Credits;
 
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 	FOnCreditsChanged OnCreditsChanged;
+
+	UFUNCTION()
+	void OnRep_Credits(int32 OldCredits);
 
 public:
 

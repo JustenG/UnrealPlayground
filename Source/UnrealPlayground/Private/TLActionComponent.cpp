@@ -143,7 +143,6 @@ bool UTLActionComponent::StartActionByName(AActor* Instigator, FName ActionName)
 				ServerStartAction(Instigator, ActionName);
 			}
 
-
 			Action->StartAction(Instigator);
 			return true;
 		}
