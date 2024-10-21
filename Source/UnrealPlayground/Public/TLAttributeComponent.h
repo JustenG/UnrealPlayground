@@ -36,6 +36,9 @@ protected:
 	UFUNCTION(NetMulticast, Reliable) // @FIXME: could mark as unreliable once we moved the 'state' out of scharacter (eg. once its cosmetic only)
 	void MulticastHealthChanged(AActor* InstigatorActor, float NewHealth, float Delta);
 
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastRageChanged(AActor* InstigatorActor, float NewRage, float Delta);
+
 public:
 
 	UPROPERTY(BlueprintAssignable)

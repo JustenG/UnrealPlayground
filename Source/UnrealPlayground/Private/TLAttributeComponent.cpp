@@ -39,6 +39,12 @@ void UTLAttributeComponent::MulticastHealthChanged_Implementation(AActor* Instig
 }
 
 
+void UTLAttributeComponent::MulticastRageChanged_Implementation(AActor* InstigatorActor, float NewRage, float Delta)
+{
+	OnRageChanged.Broadcast(InstigatorActor, this, NewRage, Delta);
+}
+
+
 bool UTLAttributeComponent::Kill(AActor* InstigatorActor)
 {
 	return ApplyHealthChange(InstigatorActor, -GetHealthMax());
@@ -132,10 +138,13 @@ bool UTLAttributeComponent::ApplyRageChange(AActor* InstigatorActor, float Delta
 	float RageOld = Rage;
 	float RageNew = FMath::Clamp(Rage + Delta, 0.0f, RageMax);
 	float DeltaClamped = RageNew - RageOld;
-	Rage = RageNew;
 
-	OnRageChanged.Broadcast(InstigatorActor, this, Rage, DeltaClamped);
-	
+	if (GetOwner()->HasAuthority())
+	{
+		Rage = RageNew;
+		MulticastRageChanged(InstigatorActor, Rage, DeltaClamped);
+	}
+
 	return DeltaClamped != 0;
 }
 

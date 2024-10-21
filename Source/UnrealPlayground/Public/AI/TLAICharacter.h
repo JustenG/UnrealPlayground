@@ -37,9 +37,6 @@ protected:
 	UPROPERTY()
 	UTLWorldUserWidget* ActiveHealthBar;
 
-	UPROPERTY()
-	UTLWorldUserWidget* ActiveAlert;
-
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
 	TSubclassOf<UUserWidget> HealthBarWidgetClass;
 
@@ -67,7 +64,9 @@ protected:
 	UFUNCTION()
 	void OnPawnSeen(APawn* Pawn);
 
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastPawnSeen();
+
 	UFUNCTION()
 	void OnHealthChanged(AActor* InstigatorActor, UTLAttributeComponent* OwningComp, float NewHealth, float Delta);
-
 };

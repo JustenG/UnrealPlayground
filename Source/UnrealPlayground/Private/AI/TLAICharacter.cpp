@@ -64,22 +64,31 @@ AActor* ATLAICharacter::GetTargetActor() const
 
 void ATLAICharacter::OnPawnSeen(APawn* Pawn)
 {
-	AAIController* AIC = GetController<AAIController>();
-	if (AIC)
+	if (GetOwner()->HasAuthority())
 	{
-		AIC->GetBlackboardComponent()->SetValueAsObject(TargetActorKey, Pawn);
-
-		if (!ActiveAlert && ensure(AlertWidgetClass))
+		if (GetTargetActor() != Pawn)
 		{
-			ActiveAlert = CreateWidget<UTLWorldUserWidget>(GetWorld(), AlertWidgetClass);
-			if (ActiveAlert)
-			{
-				ActiveAlert->AttachedActor = this;
-				ActiveAlert->AddToViewport();
-			}
+			if(GetTargetActor() == nullptr)
+				MulticastPawnSeen(); // Only Send widget request if first time
+
+			SetTargetActor(Pawn);
 		}
-		DrawDebugString(GetWorld(), GetActorLocation(), "PLAYER SPOTTED", nullptr, FColor::White, 0.5f, true);	
 	}
+}
+
+
+void ATLAICharacter::MulticastPawnSeen_Implementation()
+{
+	if (ensure(AlertWidgetClass))
+	{
+		UTLWorldUserWidget* NewAlertWidget = CreateWidget<UTLWorldUserWidget>(GetWorld(), AlertWidgetClass);
+		if (NewAlertWidget)
+		{
+			NewAlertWidget->AttachedActor = this;
+			NewAlertWidget->AddToViewport();
+		}
+	}
+	DrawDebugString(GetWorld(), GetActorLocation(), "PLAYER SPOTTED", nullptr, FColor::White, 0.5f, true);
 }
 
 
