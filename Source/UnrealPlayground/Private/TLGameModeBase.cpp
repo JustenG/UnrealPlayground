@@ -10,7 +10,11 @@
 #include "EngineUtils.h"
 #include "TLCharacter.h"
 #include "TLPlayerState.h"
-
+#include "TLSaveGame.h"
+#include "Kismet/GameplayStatics.h"
+#include "GameFramework/GameStateBase.h"
+#include "TLGameplayInterface.h"
+#include "Serialization/ObjectAndNameAsStringProxyArchive.h"
 
 static TAutoConsoleVariable<bool> CVarSpawnBots(TEXT("tl.SpawnBots"), true, TEXT("Enable spawning of bots via timer."), ECVF_Cheat);
 
@@ -21,6 +25,16 @@ ATLGameModeBase::ATLGameModeBase()
 	PlayerStateClass = ATLPlayerState::StaticClass();
 	SpawnTimerInterval = 2.0f;
 	CreditsPerKill = 50;
+
+	SlotName = "SaveGame01";
+}
+
+
+void ATLGameModeBase::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
+{
+	Super::InitGame(MapName, Options, ErrorMessage);
+
+	LoadSaveGame();
 }
 
 
@@ -32,6 +46,20 @@ void ATLGameModeBase::StartPlay()
 
 	FEnvQueryRequest Request(SpawnPickupItemQuery, this); // See UEnvQueryManager::RunEQSQuery Line 1061
 	Request.Execute(EEnvQueryRunMode::RandomBest5Pct, this, &ATLGameModeBase::SpawnPickupItemQueryCompleted); // See UEnvQueryInstanceBlueprintWrapper::RunQuery Line 130
+	
+	ApplyLoadedSaveGame();
+}
+
+
+void ATLGameModeBase::HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer)
+{
+	Super::HandleStartingNewPlayer_Implementation(NewPlayer);
+
+	ATLPlayerState* PS = NewPlayer->GetPlayerState<ATLPlayerState>();
+	if (PS)
+	{
+		PS->LoadPlayerState(CurrentSaveGame);
+	}
 }
 
 
@@ -164,6 +192,101 @@ void ATLGameModeBase::OnActorKilled(AActor* VictimActor, AActor* Killer)
 	}
 	
 	UE_LOG(LogTemp, Log, TEXT("OnActorKilled: Victim: %s, Killer: %s"), *GetNameSafe(VictimActor), *GetNameSafe(Killer));
+}
+
+
+void ATLGameModeBase::WriteSaveGame()
+{
+	// Iterate all player states, we don't have proper ID to match yet (requires Steam or EOS)
+	for (int32 i = 0; i < GameState->PlayerArray.Num(); i++)
+	{
+		ATLPlayerState* PS = Cast<ATLPlayerState>(GameState->PlayerArray[i]);
+		if (PS)
+		{
+			PS->SavePlayerState(CurrentSaveGame);
+			break; // single player only at this point
+		}
+	}
+
+	CurrentSaveGame->SavedActors.Empty();
+
+	// Iterate the entire world of actors
+	for (FActorIterator It(GetWorld()); It; ++It)
+	{
+		AActor* Actor = *It;
+		// Only interested in our 'gameplay actors'
+		if (!Actor->Implements<UTLGameplayInterface>())
+		{
+			continue;
+		}
+
+		FActorSaveData ActorData;
+		ActorData.ActorName = Actor->GetName();
+		ActorData.Transform = Actor->GetActorTransform();
+
+		FMemoryWriter MemWriter(ActorData.ByteData);
+		FObjectAndNameAsStringProxyArchive Ar(MemWriter, true);
+		Ar.ArIsSaveGame = true; // Find only variables with UPROPERTY(SaveGame)
+		Actor->Serialize(Ar);// Converts Actor's SaveGame UPROPERTIES into binary array
+
+		CurrentSaveGame->SavedActors.Add(ActorData);
+	}
+
+	UGameplayStatics::SaveGameToSlot(CurrentSaveGame, SlotName, 0);
+}
+
+
+void ATLGameModeBase::LoadSaveGame()
+{
+	if (UGameplayStatics::DoesSaveGameExist(SlotName, 0))
+	{
+		CurrentSaveGame = Cast<UTLSaveGame>(UGameplayStatics::LoadGameFromSlot(SlotName, 0));
+		if (CurrentSaveGame == nullptr)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Failed to load SaveGame Data."));
+			return;
+		}
+
+		UE_LOG(LogTemp, Log, TEXT("Loaded SaveGame Data."));
+	}
+	else
+	{
+		CurrentSaveGame = Cast<UTLSaveGame>(UGameplayStatics::CreateSaveGameObject(UTLSaveGame::StaticClass()));
+
+		UE_LOG(LogTemp, Log, TEXT("Created New SaveGame Data."));
+	}
+}
+
+
+void ATLGameModeBase::ApplyLoadedSaveGame()
+{
+	// Iterate the entire world of actors
+	for (FActorIterator It(GetWorld()); It; ++It)
+	{
+		AActor* Actor = *It;
+		// Only interested in our 'gameplay actors'
+		if (!Actor->Implements<UTLGameplayInterface>())
+		{
+			continue;
+		}
+
+		for (FActorSaveData ActorData : CurrentSaveGame->SavedActors)
+		{
+			if (ActorData.ActorName == Actor->GetName())
+			{
+				Actor->SetActorTransform(ActorData.Transform);
+
+				FMemoryReader MemReader(ActorData.ByteData);
+				FObjectAndNameAsStringProxyArchive Ar(MemReader, true);
+				Ar.ArIsSaveGame = true;
+				Actor->Serialize(Ar); // Convert binary array back into actor's variables
+
+				ITLGameplayInterface::Execute_OnActorLoaded(Actor);
+
+				break;
+			}
+		}
+	}
 }
 
 

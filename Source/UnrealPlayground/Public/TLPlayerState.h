@@ -6,6 +6,7 @@
 #include "GameFramework/PlayerState.h"
 #include "TLPlayerState.generated.h"
 
+class UTLSaveGame;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnCreditsChanged, AActor*, InsitgatorActor, float, NewCredits, float, Delta);
 
@@ -38,4 +39,10 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Credits")
 	int32 GetCredits() const;
+
+	UFUNCTION(BlueprintNativeEvent)
+	void SavePlayerState(UTLSaveGame* SaveObject);
+
+	UFUNCTION(BlueprintNativeEvent)
+	void LoadPlayerState(UTLSaveGame* SaveObject);
 };

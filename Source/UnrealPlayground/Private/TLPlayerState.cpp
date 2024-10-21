@@ -4,7 +4,7 @@
 #include "TLPlayerState.h"
 #include "../UnrealPlayground.h"
 #include "Net/UnrealNetwork.h"
-
+#include "TLSaveGame.h"
 
 void ATLPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
@@ -59,4 +59,22 @@ bool ATLPlayerState::RemoveCredits(int32 Delta)
 int32 ATLPlayerState::GetCredits() const
 {
 	return Credits;
+}
+
+void ATLPlayerState::SavePlayerState_Implementation(UTLSaveGame* SaveObject)
+{
+	if (SaveObject)
+	{
+		SaveObject->Credits = Credits;
+	}
+}
+
+
+void ATLPlayerState::LoadPlayerState_Implementation(UTLSaveGame* SaveObject)
+{
+	if (SaveObject)
+	{
+		Credits = SaveObject->Credits;
+		OnCreditsChanged.Broadcast(this, Credits, 0);
+	}
 }

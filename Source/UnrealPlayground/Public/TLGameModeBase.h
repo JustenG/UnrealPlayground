@@ -10,6 +10,7 @@
 
 class UEnvQuery;
 class UCurveFloat;
+class UTLSaveGame;
 
 /**
  * 
@@ -23,12 +24,21 @@ public:
 
 	ATLGameModeBase();
 
+	virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
+
 	virtual void StartPlay() override;
+
+	void HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer) override;
 
 // Custom Code
 protected:
 
 	FTimerHandle TimerHandle_SpawnBots;
+
+	FString SlotName;
+
+	UPROPERTY()
+	UTLSaveGame* CurrentSaveGame;
 
 	UPROPERTY(EditDefaultsOnly, Category = "AI")
 	float CreditsPerKill;
@@ -69,6 +79,13 @@ protected:
 public:
 
 	virtual void OnActorKilled(AActor* VictimActor, AActor* Killer);
+
+	UFUNCTION(BlueprintCallable, Category = "SaveGame")
+	void WriteSaveGame();
+
+	void LoadSaveGame();
+
+	void ApplyLoadedSaveGame();
 
 // Commands/Cheats
 public:

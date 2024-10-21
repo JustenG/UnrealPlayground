@@ -34,7 +34,7 @@ private:
 
 protected:
 
-	UPROPERTY(ReplicatedUsing="OnRep_LidOpened")
+	UPROPERTY(ReplicatedUsing="OnRep_LidOpened", SaveGame)
 	bool bLidOpened;
 
 	UFUNCTION()
@@ -47,6 +47,8 @@ protected:
 	TObjectPtr<UStaticMeshComponent> LidMesh;
 
 public:
+
+	virtual void OnActorLoaded_Implementation() override;
 
 	virtual void Interact_Implementation(APawn* InstigatorPawn, ETLInteractionType InteractionTypeUsed) override;
 };

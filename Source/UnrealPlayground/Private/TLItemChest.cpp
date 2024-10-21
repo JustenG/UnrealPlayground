@@ -46,6 +46,12 @@ void ATLItemChest::OnRep_LidOpened()
 }
 
 
+void ATLItemChest::OnActorLoaded_Implementation()
+{
+	OnRep_LidOpened();
+}
+
+
 void ATLItemChest::Interact_Implementation(APawn* InstigatorPawn, ETLInteractionType InteractionTypeUsed)
 {
 	if (InteractionTypeUsed == ETLInteractionType::EBT_NEARBY)
