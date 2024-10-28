@@ -18,7 +18,23 @@ protected:
 
 	virtual void BeginPlayingState() override;
 
+	void SetupInputComponent() override;
+
+// Custom Code
+protected:
+
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
+	TSubclassOf<UUserWidget> PauseMenuClass;
+
+	UPROPERTY()
+	UUserWidget* PauseMenuInstance;
+
+
 	UFUNCTION(BlueprintImplementableEvent)
 	void BlueprintBeginPlayingState();
+
+	UFUNCTION(BlueprintCallable)
+	void TogglePauseMenu();
+
 	
 };
