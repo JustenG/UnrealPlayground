@@ -3,8 +3,7 @@
 
 #include "TLActionEffect.h"
 #include "TLActionComponent.h"
-
-
+#include "GameFramework/GameStateBase.h"
 
 
 UTLActionEffect::UTLActionEffect()
@@ -16,6 +15,18 @@ UTLActionEffect::UTLActionEffect()
 void UTLActionEffect::ExecutePeriodicEffect_Implementation(AActor* Instigator)
 {
 
+}
+
+
+float UTLActionEffect::GetTimeRemaining() const
+{
+	AGameStateBase* GameState = GetWorld()->GetGameState<AGameStateBase>();
+	if (GameState)
+	{
+		float EndTime = TimeStarted + Duration;
+		return EndTime - GameState->GetServerWorldTimeSeconds();
+	}
+	return Duration;
 }
 
 

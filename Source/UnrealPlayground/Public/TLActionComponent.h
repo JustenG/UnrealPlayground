@@ -9,6 +9,8 @@
 
 class UTLAction;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnActionStateChanged, UTLActionComponent*, OwningComp, UTLAction*, Action);
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class UNREALPLAYGROUND_API UTLActionComponent : public UActorComponent
 {
@@ -35,7 +37,7 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Actions")
 	TArray<TSubclassOf<UTLAction>> DefaultActions;
 
-	UPROPERTY(Replicated)
+	UPROPERTY(BlueprintReadOnly, Replicated)
 	TArray<UTLAction*> Actions;
 
 	UFUNCTION(Server, Reliable)
@@ -45,6 +47,12 @@ protected:
 	void ServerStopAction(AActor* Instigator, FName ActionName);
 
 public:	
+
+	UPROPERTY(BlueprintAssignable)
+	FOnActionStateChanged OnActionStarted;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnActionStateChanged OnActionStopped;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tags")
 	FGameplayTagContainer ActiveGameplayTags;

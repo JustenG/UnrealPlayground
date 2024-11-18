@@ -36,6 +36,9 @@ protected:
 
 public:
 
+	UFUNCTION(BlueprintCallable, Category = "Action")
+	float GetTimeRemaining() const;
+
 	virtual void StartAction(AActor* Instigator) override;
 
 	virtual void StopAction(AActor* Instigator) override;

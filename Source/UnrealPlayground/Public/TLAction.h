@@ -37,6 +37,12 @@ class UNREALPLAYGROUND_API UTLAction : public UObject
 protected:
 
 	UPROPERTY(Replicated)
+	float TimeStarted;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
+	UTexture2D* Icon;
+
+	UPROPERTY(Replicated)
 	UTLActionComponent* ActionComp;
 
 	UPROPERTY(ReplicatedUsing = "OnRep_RepData")
