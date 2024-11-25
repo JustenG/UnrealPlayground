@@ -30,9 +30,22 @@ ATLPickupItem::ATLPickupItem()
 }
 
 
+bool ATLPickupItem::GetIsActive()
+{
+	return bIsActive;
+}
+
+
 void ATLPickupItem::Interact_Implementation(APawn* InstigatorPawn, ETLInteractionType InteractionTypeUsed)
 {
 	// Implement in derived classes
+}
+
+
+FText ATLPickupItem::GetInteractText_Implementation(APawn* InstigatorPawn)
+{
+	// Implement in derived classes
+	return FText::GetEmpty();
 }
 
 

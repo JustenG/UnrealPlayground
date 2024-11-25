@@ -56,5 +56,9 @@ protected:
 
 public:
 
+	bool GetIsActive();
+
 	virtual void Interact_Implementation(APawn* InstigatorPawn, ETLInteractionType InteractionTypeUsed) override;
+
+	virtual FText GetInteractText_Implementation(APawn* InstigatorPawn) override;
 };

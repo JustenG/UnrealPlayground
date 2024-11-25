@@ -11,6 +11,8 @@
 #include "TLPlayerState.h"
 
 
+#define LOCTEXT_NAMESPACE "InteractableActors"
+
 // Sets default values
 ATLPickupItem_HealthPotion::ATLPickupItem_HealthPotion() : ATLPickupItem()
 {
@@ -44,3 +46,16 @@ void ATLPickupItem_HealthPotion::Interact_Implementation(APawn* InstigatorPawn, 
 	}
 }
 
+
+FText ATLPickupItem_HealthPotion::GetInteractText_Implementation(APawn* InstigatorPawn)
+{
+	UTLAttributeComponent* AttributeComp = UTLAttributeComponent::GetAttributes(InstigatorPawn);
+	if (AttributeComp && AttributeComp->IsFullHealth())
+	{
+		return LOCTEXT("HealthPotion_FullHealthWarning", "Already at full health.");
+	}
+
+	return FText::Format(LOCTEXT("HealthPotion_InteractMessage", "Cost {0} Credits. Restores health to maximum."), CreditsCost);
+}
+
+#undef LOCTEXT_NAMESPACE

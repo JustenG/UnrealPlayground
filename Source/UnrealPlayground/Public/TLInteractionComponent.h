@@ -8,6 +8,7 @@
 #include "TLInteractionComponent.generated.h"
 
 class USphereComponent;
+class UTLWorldUserWidget;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class UNREALPLAYGROUND_API UTLInteractionComponent : public UActorComponent
@@ -49,10 +50,18 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Interact")
 	TEnumAsByte<ECollisionChannel> CollisionChannel;
 
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
+	TSubclassOf<UTLWorldUserWidget> InteractInfoWidgetClass;
+
+	UPROPERTY()
+	UTLWorldUserWidget* InteractInfoWidgetInstance;
+
 public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	float GetMaxInteractDistance();
+
+	void UpdateInteractUI(AActor* TargetActor);
 
 	void FindInteractiveObjects();
 

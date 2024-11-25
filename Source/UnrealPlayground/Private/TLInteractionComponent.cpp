@@ -7,6 +7,8 @@
 #include "Camera/CameraComponent.h"
 #include "Components/SphereComponent.h"
 #include "DrawDebugHelpers.h"
+#include "TLWorldUserWidget.h"
+#include <TLPickupItem.h>
 
 
 static TAutoConsoleVariable<bool> CVarDebugDrawInteraction(TEXT("tl.DebugDraw.Interaction"), false, TEXT("Enable Debug Lines for Interact Component."), ECVF_Cheat);
@@ -41,6 +43,26 @@ float UTLInteractionComponent::GetMaxInteractDistance_Implementation()
 	return MaxInteractDistance;
 }
 
+
+void UTLInteractionComponent::UpdateInteractUI(AActor* TargetActor)
+{
+	if (InteractInfoWidgetInstance == nullptr && ensure(InteractInfoWidgetClass))
+	{
+		InteractInfoWidgetInstance = CreateWidget<UTLWorldUserWidget>(GetWorld(), InteractInfoWidgetClass);
+	}
+
+	if (InteractInfoWidgetInstance)
+	{
+		InteractInfoWidgetInstance->AttachedActor = TargetActor;
+
+		if (!InteractInfoWidgetInstance->IsInViewport())
+		{
+			InteractInfoWidgetInstance->AddToViewport();
+		}
+	}
+}
+
+
 void UTLInteractionComponent::FindInteractiveObjects()
 {
 	const bool bDebugDraw = CVarDebugDrawInteraction.GetValueOnGameThread();
@@ -50,19 +72,51 @@ void UTLInteractionComponent::FindInteractiveObjects()
 	MyOwner->GetWorldTimerManager().ClearTimer(TimerHandle_PollRateDelay);
 	MyOwner->GetWorldTimerManager().SetTimer(TimerHandle_PollRateDelay, this, &UTLInteractionComponent::FindInteractiveObjects, PollRateDelay);
 
-	FVector CurrentOwnerLocation = MyOwner->GetActorLocation();
+	FCollisionObjectQueryParams ObjectQueryParams;
+	ObjectQueryParams.AddObjectTypesToQuery(CollisionChannel);
 
+	// Check for Direct Interact UI Info
+	FVector EyeLocation;
+	FRotator EyeRotation;
+	MyOwner->GetActorEyesViewPoint(EyeLocation, EyeRotation);
+	FVector End = EyeLocation + (EyeRotation.Vector() * MaxInteractDistance);
+
+	TArray<FHitResult> Hits;
+	FCollisionShape Shape;
+	Shape.SetSphere(MaxContactDistance);
+	GetWorld()->SweepMultiByObjectType(Hits, EyeLocation, End, FQuat::Identity, ObjectQueryParams, Shape);
+
+	AActor* TargetDirectActor = nullptr;
+	for (FHitResult Hit : Hits)
+	{
+		AActor* HitActor = Hit.GetActor();
+		if (HitActor)
+		{
+			if (HitActor->Implements<UTLGameplayInterface>())
+			{
+				ATLPickupItem* PickupItem = Cast<ATLPickupItem>(TargetDirectActor);
+				if (PickupItem == nullptr || PickupItem->GetIsActive())
+				{
+					TargetDirectActor = HitActor;
+					break;
+				}
+			}
+		}
+	}
+
+	if (TargetDirectActor != nullptr)
+	{
+		UpdateInteractUI(TargetDirectActor);
+	}
+
+	FVector CurrentOwnerLocation = MyOwner->GetActorLocation();
 	if (FVector::Distance(CurrentOwnerLocation, LastPollLocation) < MaxContactDistance)
 	{
 		return;
 	}
 
 	// Update InteractableObjects List
-	FCollisionObjectQueryParams ObjectQueryParams;
-	ObjectQueryParams.AddObjectTypesToQuery(CollisionChannel);
-
-	TArray<FHitResult> Hits;
-	FCollisionShape Shape;
+	Hits.Empty();
 	Shape.SetSphere(MaxInteractDistance);
 	GetWorld()->SweepMultiByObjectType(Hits, MyOwner->GetActorLocation(), MyOwner->GetActorLocation(), FQuat::Identity, ObjectQueryParams, Shape);
 
@@ -73,6 +127,23 @@ void UTLInteractionComponent::FindInteractiveObjects()
 		if (HitActor->Implements<UTLGameplayInterface>())
 		{
 			InteractableActorsNearby.Add(HitActor);
+			if (TargetDirectActor == nullptr)
+			{
+				ATLPickupItem* PickupItem = Cast<ATLPickupItem>(TargetDirectActor);
+				if (PickupItem == nullptr || PickupItem->GetIsActive())
+				{
+					TargetDirectActor = HitActor;
+				}
+				UpdateInteractUI(TargetDirectActor);
+			}
+		}
+	}
+
+	if (TargetDirectActor == nullptr)
+	{
+		if (InteractInfoWidgetInstance)
+		{
+			InteractInfoWidgetInstance->RemoveFromParent();
 		}
 	}
 
