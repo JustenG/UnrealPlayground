@@ -36,10 +36,13 @@ ATLMagicProjectile::ATLMagicProjectile()
 	AudioComp = CreateDefaultSubobject<UAudioComponent>("AudioComp");
 	AudioComp->SetupAttachment(RootComponent);
 
+	InitialLifeSpan = 10.0f;
+
 	ImpactShakeRadius = 1500.0f;
 	DamageAmount = 20.0f;
 
-	SetReplicates(true);
+	bReplicates = true;
+	//SetReplicates(true);
 }
 
 

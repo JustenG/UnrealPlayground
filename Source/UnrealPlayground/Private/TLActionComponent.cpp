@@ -8,6 +8,9 @@
 #include "Engine/ActorChannel.h"
 
 
+DECLARE_CYCLE_STAT(TEXT("StartActionByName"), STAT_StartActionByName, STATGROUP_UNREALPLAYGROUND);
+
+
 UTLActionComponent::UTLActionComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
@@ -36,6 +39,22 @@ void UTLActionComponent::BeginPlay()
 			AddAction(GetOwner(), ActionClass);
 		}
 	}
+}
+
+
+void UTLActionComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	// Stop all
+	TArray<UTLAction*> ActionsCopy = Actions;
+	for (UTLAction* Action : ActionsCopy)
+	{
+		if (Action && Action->IsRunning())
+		{
+			Action->StopAction(GetOwner());
+		}
+	}
+
+	Super::EndPlay(EndPlayReason);
 }
 
 
@@ -126,6 +145,8 @@ void UTLActionComponent::RemoveAction(UTLAction* ActionToRemove)
 
 bool UTLActionComponent::StartActionByName(AActor* Instigator, FName ActionName)
 {
+	SCOPE_CYCLE_COUNTER(STAT_StartActionByName);
+
 	for (UTLAction* Action : Actions)
 	{
 		if (Action && Action->ActionName == ActionName)
@@ -142,6 +163,9 @@ bool UTLActionComponent::StartActionByName(AActor* Instigator, FName ActionName)
 			{
 				ServerStartAction(Instigator, ActionName);
 			}
+
+			// Bookmark for Unreal Insights
+			TRACE_BOOKMARK(TEXT("StartAction::%s"), *GetNameSafe(Action));
 
 			Action->StartAction(Instigator);
 			return true;

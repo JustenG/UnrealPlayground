@@ -19,7 +19,8 @@ ATLItemChest::ATLItemChest()
 
 	TargetPitch = 110;
 
-	SetReplicates(true);
+	bReplicates = true;
+	//SetReplicates(true);
 }
 
 
