@@ -15,6 +15,10 @@
 #include "GameFramework/GameStateBase.h"
 #include "TLGameplayInterface.h"
 #include "Serialization/ObjectAndNameAsStringProxyArchive.h"
+#include "TLMonsterData.h"
+#include "../UnrealPlayground.h"
+#include "TLActionComponent.h"
+#include "Engine/AssetManager.h"
 
 static TAutoConsoleVariable<bool> CVarSpawnBots(TEXT("tl.SpawnBots"), true, TEXT("Enable spawning of bots via timer."), ECVF_Cheat);
 
@@ -92,6 +96,37 @@ void ATLGameModeBase::SpawnBotTimerElapsed()
 }
 
 
+
+void ATLGameModeBase::OnMonsterLoaded(FPrimaryAssetId LoadedId, FVector SpawnLocation)
+{
+	LogOnScreen(this, "Finished loading.", FColor::Green);
+
+	UAssetManager* Manager = UAssetManager::GetIfValid();
+	if (Manager)
+	{
+		UTLMonsterData* MonsterData = Cast<UTLMonsterData>(Manager->GetPrimaryAssetObject(LoadedId));
+		if (MonsterData)
+		{
+			AActor* NewBot = GetWorld()->SpawnActor<AActor>(MonsterData->MonsterClass, SpawnLocation, FRotator::ZeroRotator);
+			if (NewBot)
+			{
+				LogOnScreen(this, FString::Printf(TEXT("Spawned enemy: %s (%s)"), *GetNameSafe(NewBot), *GetNameSafe(MonsterData)));
+
+				// Grant special actions, buffs etc.
+				UTLActionComponent* ActionComp = Cast<UTLActionComponent>(NewBot->GetComponentByClass(UTLActionComponent::StaticClass()));
+				if (ActionComp)
+				{
+					for (TSubclassOf<UTLAction> ActionClass : MonsterData->Actions)
+					{
+						ActionComp->AddAction(NewBot, ActionClass);
+					}
+				}
+			}
+		}
+	}
+}
+
+
 void ATLGameModeBase::SpawnBotQueryCompleted(TSharedPtr<FEnvQueryResult> Result)
 {
 	FEnvQueryResult* QueryResult = Result.Get();
@@ -106,7 +141,29 @@ void ATLGameModeBase::SpawnBotQueryCompleted(TSharedPtr<FEnvQueryResult> Result)
 
 	if (Locations.IsValidIndex(0))
 	{
-		GetWorld()->SpawnActor<AActor>(MinionClass, Locations[0], FRotator::ZeroRotator);
+		//GetWorld()->SpawnActor<AActor>(MinionClass, Locations[0], FRotator::ZeroRotator);
+
+		if (MonsterTable)
+		{
+			TArray<FTLMonsterInfoRow*> Rows;
+			MonsterTable->GetAllRows("", Rows);
+
+			// Get Random Enemy
+			int32 RandomIndex = FMath::RandRange(0, Rows.Num() - 1);
+			FTLMonsterInfoRow* SelectedRow = Rows[RandomIndex];
+
+
+			UAssetManager* Manager = UAssetManager::GetIfValid();
+			if (Manager)
+			{
+				LogOnScreen(this, "Loading monster...", FColor::Green);
+
+				TArray<FName> Bundles;
+				FStreamableDelegate Delegate = FStreamableDelegate::CreateUObject(this, &ATLGameModeBase::OnMonsterLoaded, SelectedRow->MonsterId, Locations[0]);
+				Manager->LoadPrimaryAsset(SelectedRow->MonsterId, Bundles, Delegate);
+			}
+
+		}
 	}
 }
 
